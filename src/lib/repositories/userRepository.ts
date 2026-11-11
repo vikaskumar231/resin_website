@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
+import { atomicWriteJsonSync } from "@/lib/utils/atomicFileWrite";
 
 export type UserRole = "CUSTOMER" | "ARTISAN_ADMIN" | "WORKSHOP_MAKER";
 
@@ -57,8 +58,12 @@ export class FileUserRepository implements UserRepository {
   }
 
   private getDefaultUsers(): UserRecord[] {
-    const adminUser = (process.env.ADMIN_USERNAME || "Vikas").trim();
-    const adminPass = (process.env.ADMIN_PASSWORD || "Vikas").trim();
+    const isProduction = process.env.NODE_ENV === "production";
+    const adminUser = (process.env.ADMIN_USERNAME || (isProduction ? "artisan_admin" : "Vikas")).trim();
+    const adminPass = (
+      process.env.ADMIN_PASSWORD ||
+      (isProduction ? crypto.randomBytes(24).toString("hex") : "Vikas")
+    ).trim();
 
     const adminSalt = crypto.randomBytes(16).toString("hex");
     const adminHash = hashPassword(adminPass, adminSalt);
@@ -153,7 +158,7 @@ export class FileUserRepository implements UserRepository {
   private writeToDisk(users: UserRecord[]): void {
     try {
       this.ensureFileExists();
-      fs.writeFileSync(this.filePath, JSON.stringify(users, null, 2), "utf-8");
+      atomicWriteJsonSync(this.filePath, users);
     } catch (err) {
       console.error("[FileUserRepository] Error writing users to disk:", err);
       throw new Error("Failed to write users to disk storage.");

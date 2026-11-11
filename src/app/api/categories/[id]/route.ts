@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { categoryRepository } from "@/lib/repositories/categoryRepository";
 import { productRepository } from "@/lib/repositories/productRepository";
+import { verifyAdminSession } from "@/lib/auth/adminGuard";
 
 interface RouteParams {
   params: {
@@ -10,6 +11,11 @@ interface RouteParams {
 
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
   try {
+    const auth = await verifyAdminSession(req);
+    if (!auth.isAuthorized) {
+      return auth.errorResponse!;
+    }
+
     const { id } = params;
     const body = await req.json();
 
@@ -42,6 +48,11 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
   try {
+    const auth = await verifyAdminSession(req);
+    if (!auth.isAuthorized) {
+      return auth.errorResponse!;
+    }
+
     const { id } = params;
     const cleanId = id.toUpperCase();
 

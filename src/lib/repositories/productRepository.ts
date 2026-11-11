@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { ProductCatalogItem, HERO_PRODUCTS } from "@/lib/mockData";
+import { atomicWriteJsonSync } from "@/lib/utils/atomicFileWrite";
 
 export interface ProductRepository {
   getAll(): Promise<ProductCatalogItem[]>;
@@ -52,7 +53,7 @@ export class FileProductRepository implements ProductRepository {
   private writeToDisk(products: ProductCatalogItem[]): void {
     try {
       this.ensureFileExists();
-      fs.writeFileSync(this.filePath, JSON.stringify(products, null, 2), "utf-8");
+      atomicWriteJsonSync(this.filePath, products);
     } catch (err) {
       console.error("[FileProductRepository] Error writing products to disk:", err);
       throw new Error("Failed to write products to disk storage.");

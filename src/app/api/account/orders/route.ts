@@ -15,24 +15,34 @@ export async function GET(req: NextRequest) {
     const sessionCookie = req.cookies.get("art_aalay_session")?.value;
     const session = sessionCookie ? await verifySessionToken(sessionCookie) : null;
 
-    const effectiveUserId = queryUserId || (session?.valid ? session.userId : null);
-    const effectivePhone = queryPhone || null;
-    const effectiveEmail = queryEmail || null;
-
     let orders = [];
 
-    if (effectiveUserId || effectivePhone || effectiveEmail) {
+    if (session?.valid && session.role === "ARTISAN_ADMIN") {
+      // Admin: Can query specific user or fetch all orders
+      if (queryUserId || queryPhone || queryEmail) {
+        orders = orderRepository.getOrdersForUser({
+          userId: queryUserId || null,
+          phone: queryPhone || null,
+          email: queryEmail || null,
+        });
+      } else {
+        orders = orderRepository.getAllOrders();
+      }
+    } else if (session?.valid && session.userId) {
+      // Authenticated Customer: Strictly bounded to their own verified identity (IDOR Prevention)
       orders = orderRepository.getOrdersForUser({
-        userId: effectiveUserId,
-        phone: effectivePhone,
-        email: effectiveEmail,
+        userId: session.userId,
+        phone: queryPhone || null,
+        email: queryEmail || null,
       });
-    } else if (session?.valid && session.role === "ARTISAN_ADMIN") {
-      orders = orderRepository.getAllOrders();
     } else {
-      // Default fallback: return demo patron orders if generic customer is browsing
-      orders = orderRepository.getOrdersForUser({
-        userId: "user_cust_priya_01",
+      // Unauthenticated visitor: Do NOT disclose customer orders or PII
+      return NextResponse.json({
+        success: true,
+        orders: [],
+        count: 0,
+        requireLogin: true,
+        message: "Sign in to view your personalized order history.",
       });
     }
 

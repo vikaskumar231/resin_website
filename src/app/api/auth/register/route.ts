@@ -2,7 +2,42 @@ import { NextRequest, NextResponse } from "next/server";
 import { userRepository } from "@/lib/repositories/userRepository";
 import { signSessionToken, SESSION_COOKIE_NAME, ROLE_COOKIE_NAME } from "@/lib/auth/session";
 
+interface RateLimitEntry {
+  attempts: number;
+  firstAttemptTime: number;
+}
+
+const registerRateLimitMap = new Map<string, RateLimitEntry>();
+const MAX_REGISTER_ATTEMPTS = 5;
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+
+function getClientIp(req: NextRequest): string {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) return forwarded.split(",")[0].trim();
+  const realIp = req.headers.get("x-real-ip");
+  if (realIp) return realIp.trim();
+  return "127.0.0.1";
+}
+
 export async function POST(req: NextRequest) {
+  const clientIp = getClientIp(req);
+  const now = Date.now();
+  const entry = registerRateLimitMap.get(clientIp);
+
+  if (entry) {
+    if (now - entry.firstAttemptTime > RATE_LIMIT_WINDOW_MS) {
+      registerRateLimitMap.delete(clientIp);
+    } else if (entry.attempts >= MAX_REGISTER_ATTEMPTS) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Too many accounts created from this network. Please try again after 15 minutes.",
+        },
+        { status: 429 }
+      );
+    }
+  }
+
   try {
     const body = await req.json();
     const { name, username, email, phone, password } = body;
@@ -32,6 +67,13 @@ export async function POST(req: NextRequest) {
         { success: false, error: "Password must be at least 6 characters long." },
         { status: 400 }
       );
+    }
+
+    // Record registration attempt for IP rate limiting
+    if (!entry || now - entry.firstAttemptTime > RATE_LIMIT_WINDOW_MS) {
+      registerRateLimitMap.set(clientIp, { attempts: 1, firstAttemptTime: now });
+    } else {
+      entry.attempts += 1;
     }
 
     // Attempt creation in registered user database

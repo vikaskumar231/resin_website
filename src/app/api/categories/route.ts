@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { categoryRepository } from "@/lib/repositories/categoryRepository";
 import { productRepository } from "@/lib/repositories/productRepository";
+import { verifyAdminSession } from "@/lib/auth/adminGuard";
 
 export async function GET() {
   try {
@@ -31,6 +32,12 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    // Zero-Trust: Verify Artisan Admin Cryptographic Session
+    const auth = await verifyAdminSession(req);
+    if (!auth.isAuthorized) {
+      return auth.errorResponse!;
+    }
+
     const body = await req.json();
     const { label, icon, description, id, slug } = body;
 
@@ -41,10 +48,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const cleanLabel = label.replace(/[<>]/g, "").trim().substring(0, 100);
+    const cleanIcon = (icon?.trim() || "✨").substring(0, 10);
+    const cleanDesc = (description?.replace(/[<>]/g, "").trim() || "Handcrafted bespoke creations").substring(0, 300);
+
     const newCategory = await categoryRepository.create({
-      label: label.trim(),
-      icon: icon?.trim() || "✨",
-      description: description?.trim() || "Handcrafted bespoke creations",
+      label: cleanLabel,
+      icon: cleanIcon,
+      description: cleanDesc,
       id: id?.trim(),
       slug: slug?.trim(),
     });

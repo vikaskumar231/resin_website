@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyRazorpaySignature } from "@/lib/payments/razorpay";
+import { orderRepository } from "@/lib/repositories/orderRepository";
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,6 +31,22 @@ export async function POST(req: NextRequest) {
         { error: "Payment signature verification failed. Possible payload tampering." },
         { status: 400 }
       );
+    }
+
+    // Link verified payment to order record for audit & accounting
+    try {
+      orderRepository.saveOrder({
+        orderNumber,
+        status: "ORDER_CONFIRMED",
+        paymentDetails: {
+          razorpayOrderId,
+          razorpayPaymentId,
+          status: "PAID",
+          paidAt: new Date().toISOString(),
+        },
+      });
+    } catch (saveErr) {
+      console.error("[verify-payment] Warning: Failed to record payment details on order:", saveErr);
     }
 
     return NextResponse.json({

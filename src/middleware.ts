@@ -23,7 +23,10 @@ export async function middleware(request: NextRequest) {
   );
 
   // 2. Strict Cryptographic Admin RBAC Guard
-  if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) {
+  const isAdminPath = pathname.startsWith("/admin") || pathname.startsWith("/api/admin");
+  const isCategoryMutation = pathname.startsWith("/api/categories") && request.method !== "GET";
+
+  if (isAdminPath || isCategoryMutation) {
     const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME)?.value;
     const authHeader = request.headers.get("authorization");
 
@@ -36,11 +39,17 @@ export async function middleware(request: NextRequest) {
       }
     }
 
-    // Check 2: Server-configured Bearer token (no hardcoded fallback)
+    // Check 2: Server-configured Bearer token using constant-time comparison
     const configuredApiKey = process.env.ADMIN_API_KEY;
-    const hasValidBearer = Boolean(
-      configuredApiKey && authHeader === `Bearer ${configuredApiKey}`
-    );
+    const expectedBearer = configuredApiKey ? `Bearer ${configuredApiKey}` : "";
+    let hasValidBearer = false;
+    if (configuredApiKey && authHeader && authHeader.length === expectedBearer.length) {
+      let mismatch = 0;
+      for (let i = 0; i < authHeader.length; i++) {
+        mismatch |= authHeader.charCodeAt(i) ^ expectedBearer.charCodeAt(i);
+      }
+      hasValidBearer = mismatch === 0;
+    }
 
     const isAuthorized = hasValidSession || hasValidBearer;
 

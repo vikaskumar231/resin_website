@@ -76,9 +76,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Configurable administrator credentials from environment
-    const expectedAdminUser = (process.env.ADMIN_USERNAME || "Vikas").trim();
-    const expectedAdminPass = (process.env.ADMIN_PASSWORD || "Vikas").trim();
+    // Configurable administrator credentials from environment (strictly hardened in production)
+    const isProduction = process.env.NODE_ENV === "production";
+    const defaultDevAdmin = isProduction ? "" : "Vikas";
+    const expectedAdminUser = (process.env.ADMIN_USERNAME || defaultDevAdmin).trim();
+    const expectedAdminPass = (process.env.ADMIN_PASSWORD || defaultDevAdmin).trim();
+
+    if (isProduction && (!expectedAdminUser || !expectedAdminPass || expectedAdminPass === "Vikas")) {
+      console.error(
+        "[CRITICAL PRODUCTION SECURITY WARNING] Master Artisan Administrator credentials (ADMIN_USERNAME & ADMIN_PASSWORD) must be explicitly configured with high-entropy non-default values in production."
+      );
+    }
 
     // 1. Look up user in registered database
     let user = await userRepository.findByIdentifier(idTrim);
@@ -110,7 +118,10 @@ export async function POST(req: NextRequest) {
 
     // 3. Scenario: User found -> Validate password cryptographically
     const isMasterAdminMatch =
-      idTrim.toLowerCase() === expectedAdminUser.toLowerCase() && pwdTrim === expectedAdminPass;
+      expectedAdminUser.length > 0 &&
+      (!isProduction || expectedAdminPass !== "Vikas") &&
+      idTrim.toLowerCase() === expectedAdminUser.toLowerCase() &&
+      pwdTrim === expectedAdminPass;
 
     const isPasswordValid =
       isMasterAdminMatch || verifyPassword(pwdTrim, user.salt, user.passwordHash);

@@ -11,6 +11,16 @@ export interface AdminAuthResult {
  * Server-side Admin Authorization Guard
  * Enforces Zero-Trust cryptographic verification for all administrative mutations (CMS, Uploads, Products).
  */
+function constantTimeEqual(a: string, b: string): boolean {
+  if (typeof a !== "string" || typeof b !== "string") return false;
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
+}
+
 export async function verifyAdminSession(req: NextRequest): Promise<AdminAuthResult> {
   const sessionCookie = req.cookies.get(SESSION_COOKIE_NAME)?.value;
   const authHeader = req.headers.get("authorization");
@@ -24,10 +34,11 @@ export async function verifyAdminSession(req: NextRequest): Promise<AdminAuthRes
     }
   }
 
-  // 2. Verify Configured Bearer Token (strictly requires configured environment secret)
+  // 2. Verify Configured Bearer Token using constant-time comparison to prevent timing attacks
   const configuredApiKey = process.env.ADMIN_API_KEY;
+  const expectedBearer = configuredApiKey ? `Bearer ${configuredApiKey}` : "";
   const hasValidBearer = Boolean(
-    configuredApiKey && authHeader === `Bearer ${configuredApiKey}`
+    configuredApiKey && authHeader && constantTimeEqual(authHeader, expectedBearer)
   );
 
   if (hasValidSession || hasValidBearer) {

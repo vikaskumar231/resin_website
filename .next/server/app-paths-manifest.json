@@ -1,12 +1,1 @@
-{
-  "/customize/page": "app/customize/page.js",
-  "/account/orders/page": "app/account/orders/page.js",
-  "/customize/[slug]/page": "app/customize/[slug]/page.js",
-  "/checkout/page": "app/checkout/page.js",
-  "/api/checkout/create-order/route": "app/api/checkout/create-order/route.js",
-  "/api/account/orders/route": "app/api/account/orders/route.js",
-  "/order-confirmation/[orderNumber]/page": "app/order-confirmation/[orderNumber]/page.js",
-  "/api/checkout/verify-payment/route": "app/api/checkout/verify-payment/route.js",
-  "/track/[orderNumber]/page": "app/track/[orderNumber]/page.js",
-  "/api/orders/track/[orderNumber]/route": "app/api/orders/track/[orderNumber]/route.js"
-}
+{}

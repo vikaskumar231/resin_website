@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { CategoryItem, INITIAL_CATEGORIES } from "@/types/category";
+import { atomicWriteJsonSync } from "@/lib/utils/atomicFileWrite";
 
 export type { CategoryItem };
 export { INITIAL_CATEGORIES };
@@ -46,7 +47,7 @@ export class FileCategoryRepository {
   private writeToDisk(categories: CategoryItem[]): void {
     try {
       this.ensureFileExists();
-      fs.writeFileSync(this.filePath, JSON.stringify(categories, null, 2), "utf-8");
+      atomicWriteJsonSync(this.filePath, categories);
     } catch (err) {
       console.error("[FileCategoryRepository] Error writing categories to disk:", err);
       throw new Error("Failed to write categories to disk storage.");

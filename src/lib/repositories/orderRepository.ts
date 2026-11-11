@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { atomicWriteJsonSync } from "@/lib/utils/atomicFileWrite";
 
 export interface OrderItemRecord {
   productId: string;
@@ -61,6 +62,12 @@ export interface OrderRecord {
     awb: string;
     trackingUrl: string;
   };
+  paymentDetails?: {
+    razorpayOrderId?: string;
+    razorpayPaymentId?: string;
+    status: "PENDING" | "PAID" | "REFUNDED";
+    paidAt?: string;
+  };
   items: OrderItemRecord[];
 }
 
@@ -90,9 +97,9 @@ function readOrdersFromDisk(): OrderRecord[] {
 function writeOrdersToDisk(orders: OrderRecord[]): void {
   try {
     ensureFile();
-    fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2), "utf-8");
+    atomicWriteJsonSync(ORDERS_FILE, orders);
   } catch (err) {
-    console.error("[orderRepository] Failed to write orders to disk:", err);
+    console.error("[orderRepository] Failed to atomically write orders to disk:", err);
   }
 }
 
@@ -181,6 +188,7 @@ export const orderRepository = {
         timeRemaining: "Chemical cure in progress",
       },
       courier: orderData.courier,
+      paymentDetails: orderData.paymentDetails,
       items: orderData.items || [],
     };
 
