@@ -1,5 +1,65 @@
 [
   {
+    "id": "ord_1794410819480",
+    "orderNumber": "ART-2026-7C20B7",
+    "userId": null,
+    "customerName": "Priya Sharma",
+    "customerEmail": "priya.sharma@example.com",
+    "customerPhone": "9876543210",
+    "createdAt": "2026-11-11T15:26:59.480Z",
+    "status": "ORDER_CONFIRMED",
+    "statusLabel": "Stage 1: Laser Cutting & Timber Prep",
+    "stageIndex": 1,
+    "grandTotal": 598,
+    "subtotal": 499,
+    "discount": 0,
+    "shippingFee": 99,
+    "giftWrapFee": 0,
+    "isTokenDeposit": true,
+    "tokenAmountPaid": 199,
+    "remainingTentativeBalance": 399,
+    "refundPolicyNotes": "50% of the token amount will be returned if final price or design is not agreed over WhatsApp.",
+    "invoiceId": "INV-2026-50748",
+    "neededByDate": "2026-11-26",
+    "neededByReason": "Housewarming",
+    "shippingAddress": {
+      "fullName": "Priya Sharma",
+      "phone": "9876543210",
+      "street": "Flat 402, Nilgiri Heights, Baner Road",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "pincode": "411045"
+    },
+    "curingTelemetry": {
+      "temperature": "26°C",
+      "humidity": "42%",
+      "timeRemaining": "Chemical cure in progress"
+    },
+    "items": [
+      {
+        "productId": "prod_1794401892702",
+        "productSlug": "petalscript-initial-resin-keychain",
+        "title": "PetalScript Initial Resin Keychain",
+        "subtitle": "GOLD FOIL CLEAR",
+        "unitPrice": 499,
+        "quantity": 1,
+        "imageUrl": "/uploads/artisan_1794401854982_9d8ddfe969e1.jpg",
+        "isCustomizable": true,
+        "customizationDetails": {
+          "letter": "W",
+          "style": "GOLD_FOIL_CLEAR",
+          "hardwareFinish": "BRUSHED_BRASS_GOLD",
+          "charm": "NONE",
+          "hasEngravedTag": false,
+          "engravedText": "",
+          "requirementsText": "",
+          "referenceImage": null
+        },
+        "id": "cart_1794410767586_10xzo"
+      }
+    ]
+  },
+  {
     "id": "ord_1794407772263",
     "orderNumber": "ART-2026-698A22",
     "userId": null,
