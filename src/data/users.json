@@ -1,0 +1,57 @@
+[
+  {
+    "id": "user_admin_vikas_01",
+    "username": "Vikas",
+    "name": "Vikas Kumar",
+    "email": "vikas@artaalay.com",
+    "phone": "+91 98765 43210",
+    "role": "ARTISAN_ADMIN",
+    "passwordHash": "4e2bf0481c237e939c5214a8bc758580671474e48610a37d990410b3580ccd75096de94665b9f2c5c1f1b862e0c37f524c15dab12eafc0d0bab422a72672c4bc",
+    "salt": "c405fc4f7c6d27ab0416c684785dc174",
+    "createdAt": "2026-10-25T10:00:00.000Z"
+  },
+  {
+    "id": "user_cust_priya_01",
+    "username": "Customer",
+    "name": "Priya Sharma",
+    "email": "priya@example.com",
+    "phone": "+91 98111 22334",
+    "role": "CUSTOMER",
+    "passwordHash": "c70ee5dbb6e10c3e839d48df064b8433abe0e6fe7d63ee31a74f4d2747d8c5999c89b7dfb5849370960b45c01a30fed2ab4a24555ff5a478308577317b667526",
+    "salt": "9367e822d2803a038c4d175ba1b5b900",
+    "createdAt": "2026-10-26T12:00:00.000Z"
+  },
+  {
+    "id": "user_cust_rahul_02",
+    "username": "rahul_patel",
+    "name": "Rahul Patel",
+    "email": "rahul@example.com",
+    "phone": "+91 98222 33445",
+    "role": "CUSTOMER",
+    "passwordHash": "a6b16628342d21b9cd739e8204a0bc930b1897f68dbd0119a83f9eb3cb2884467b32a30e302ec95886296179c828886f3ad1a961b4b1911c75b892aeecdfcc84",
+    "salt": "07353ed625b106c91946ce3a8d121b00",
+    "createdAt": "2026-10-27T14:30:00.000Z"
+  },
+  {
+    "id": "user_cust_1793798301704_jb7g",
+    "username": "new_artisan_1793798301583",
+    "name": "Meera Rajput",
+    "email": "new_artisan_1793798301583@gmail.com",
+    "phone": "",
+    "role": "CUSTOMER",
+    "passwordHash": "0ff98477f670620c702aff37f89b61478a10bc18782c365cfc9366d9d7c717082c8fb0567b0ed8b95cdc7e5705425856be19712fef4455789473dc54134d640c",
+    "salt": "759ec9fe4f215880c863a083be63173e",
+    "createdAt": "2026-11-04T13:18:21.704Z"
+  },
+  {
+    "id": "user_cust_1794394031156_nsve",
+    "username": "Priya",
+    "name": "Priya Sharma",
+    "email": "priya@priya.com",
+    "phone": "",
+    "role": "CUSTOMER",
+    "passwordHash": "7c0f402a6262422d77783366976bf7f78ccc97846c6aacaca8181c53d05b1d1e9a6b06ca4499d33defd63fa509d8a1531d5aca590ab2ceafb476986b49eff43f",
+    "salt": "5c4d149d335f6fd1b5e384a85155d597",
+    "createdAt": "2026-11-11T10:47:11.156Z"
+  }
+]
