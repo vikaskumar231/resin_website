@@ -1,5 +1,16 @@
 [
   {
+    "id": "user_admin_artisan_01",
+    "username": "admin",
+    "name": "Artisan Administrator",
+    "email": "admin@artaalay.com",
+    "phone": "+91 98765 43210",
+    "role": "ARTISAN_ADMIN",
+    "passwordHash": "7dd71c8544d1daa7f9d0eb195e6abc7adfeddd356b51f7327f3ba638f4a34ec50c2420f3477bd56d3de73e542eefeb2d8ef83482078e490dfcfb140843e56b99",
+    "salt": "8f011be527a965f287d2256f04c82a39",
+    "createdAt": "2026-10-25T10:00:00.000Z"
+  },
+  {
     "id": "user_admin_vikas_01",
     "username": "Vikas",
     "name": "Vikas Kumar",

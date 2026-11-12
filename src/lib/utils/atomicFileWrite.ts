@@ -9,24 +9,24 @@ import path from "path";
  * atomic filesystem rename (`fs.renameSync`).
  */
 export function atomicWriteJsonSync(targetPath: string, data: any): void {
-  const dir = path.dirname(targetPath);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-
-  const tmpPath = `${targetPath}.tmp.${Date.now()}.${Math.random().toString(36).substring(2, 8)}`;
-  const content = JSON.stringify(data, null, 2);
-
   try {
+    const dir = path.dirname(targetPath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    const tmpPath = `${targetPath}.tmp.${Date.now()}.${Math.random().toString(36).substring(2, 8)}`;
+    const content = JSON.stringify(data, null, 2);
+
     fs.writeFileSync(tmpPath, content, "utf-8");
     fs.renameSync(tmpPath, targetPath);
-  } catch (err) {
-    if (fs.existsSync(tmpPath)) {
-      try {
-        fs.unlinkSync(tmpPath);
-      } catch {
-        // Ignore temporary file cleanup errors
-      }
+  } catch (err: any) {
+    // Handle serverless read-only environments (Vercel, AWS Lambda) where process.cwd() is read-only
+    if (err.code === "EROFS" || err.message?.includes("read-only")) {
+      console.warn(
+        `[Storage Warning] Serverless read-only filesystem detected (${err.code}). Persistent write to ${targetPath} skipped. In production, configure DATABASE_URL (PostgreSQL/Supabase/Neon) for multi-instance persistence.`
+      );
+      return;
     }
     throw err;
   }

@@ -15,20 +15,22 @@ export class FileCategoryRepository {
   }
 
   private ensureFileExists(): void {
-    const dir = path.dirname(this.filePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    if (!fs.existsSync(this.filePath)) {
-      fs.writeFileSync(this.filePath, JSON.stringify(INITIAL_CATEGORIES, null, 2), "utf-8");
-    } else {
-      try {
+    try {
+      const dir = path.dirname(this.filePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      if (!fs.existsSync(this.filePath)) {
+        fs.writeFileSync(this.filePath, JSON.stringify(INITIAL_CATEGORIES, null, 2), "utf-8");
+      } else {
         const raw = fs.readFileSync(this.filePath, "utf-8").trim();
         if (!raw) {
           fs.writeFileSync(this.filePath, JSON.stringify(INITIAL_CATEGORIES, null, 2), "utf-8");
         }
-      } catch {
-        fs.writeFileSync(this.filePath, JSON.stringify(INITIAL_CATEGORIES, null, 2), "utf-8");
+      }
+    } catch (err: any) {
+      if (err.code !== "EROFS") {
+        console.warn("[FileCategoryRepository] ensureFileExists non-critical warning:", err.message);
       }
     }
   }

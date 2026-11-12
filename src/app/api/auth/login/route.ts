@@ -76,33 +76,86 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Configurable administrator credentials from environment (strictly hardened in production)
+    // Configurable administrator credentials from environment
     const isProduction = process.env.NODE_ENV === "production";
-    const defaultDevAdmin = isProduction ? "" : "Vikas";
-    const expectedAdminUser = (process.env.ADMIN_USERNAME || defaultDevAdmin).trim();
-    const expectedAdminPass = (process.env.ADMIN_PASSWORD || defaultDevAdmin).trim();
+    const configuredAdminUser = (process.env.ADMIN_USERNAME || "").trim();
+    const configuredAdminPass = (process.env.ADMIN_PASSWORD || "").trim();
 
-    if (isProduction && (!expectedAdminUser || !expectedAdminPass || expectedAdminPass === "Vikas")) {
-      console.error(
-        "[CRITICAL PRODUCTION SECURITY WARNING] Master Artisan Administrator credentials (ADMIN_USERNAME & ADMIN_PASSWORD) must be explicitly configured with high-entropy non-default values in production."
+    // Default fallback: "admin" / "ArtisanAdmin2026!" in production; "Vikas" / "Vikas" in development
+    const fallbackAdminUser = isProduction ? "admin" : "Vikas";
+    const fallbackAdminPass = isProduction ? "ArtisanAdmin2026!" : "Vikas";
+
+    const expectedAdminUser = configuredAdminUser || fallbackAdminUser;
+    const expectedAdminPass = configuredAdminPass || fallbackAdminPass;
+
+    // Enforce production security: dev default password "Vikas" is disallowed in production
+    if (isProduction && pwdTrim === "Vikas" && expectedAdminPass !== "Vikas") {
+      recordFailedAttempt(clientIp);
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Development credentials cannot be used in production.",
+        },
+        { status: 403 }
       );
     }
 
-    // 1. Look up user in registered database
-    let user = await userRepository.findByIdentifier(idTrim);
+    // 1. MASTER / SUPER ADMIN DIRECT AUTHENTICATION (Environment-Based Priority)
+    // Allows instant, guaranteed access for platform owner/artisan across any deployment (Vercel, Docker, Serverless)
+    if (idTrim.toLowerCase() === expectedAdminUser.toLowerCase()) {
+      if (pwdTrim === expectedAdminPass) {
+        resetRateLimit(clientIp);
 
-    // If identifier matches configured master admin username but not in db, auto-seed admin record
-    if (!user && idTrim.toLowerCase() === expectedAdminUser.toLowerCase()) {
-      const allUsers = await userRepository.getAll();
-      const existingAdmin = allUsers.find(
-        (u) => u.username.toLowerCase() === expectedAdminUser.toLowerCase()
-      );
-      if (existingAdmin) {
-        user = existingAdmin;
+        const adminUser = {
+          id: "user_master_admin",
+          username: expectedAdminUser,
+          name: process.env.ADMIN_NAME || `${expectedAdminUser} (Master Artisan)`,
+          email: process.env.ADMIN_EMAIL || `${expectedAdminUser.toLowerCase()}@artaalay.com`,
+          phone: process.env.ADMIN_PHONE || "+91 98765 43210",
+          role: "ARTISAN_ADMIN" as const,
+        };
+
+        const signedToken = await signSessionToken({
+          userId: adminUser.id,
+          role: adminUser.role,
+        });
+
+        const res = NextResponse.json({ success: true, user: adminUser });
+        res.cookies.set({
+          name: SESSION_COOKIE_NAME,
+          value: signedToken,
+          httpOnly: true,
+          path: "/",
+          sameSite: "lax",
+          secure: process.env.NODE_ENV === "production",
+          maxAge: 30 * 24 * 60 * 60,
+        });
+        res.cookies.set({
+          name: ROLE_COOKIE_NAME,
+          value: adminUser.role,
+          httpOnly: false,
+          path: "/",
+          sameSite: "lax",
+          maxAge: 30 * 24 * 60 * 60,
+        });
+        return res;
+      } else {
+        recordFailedAttempt(clientIp);
+        return NextResponse.json(
+          {
+            success: false,
+            errorType: "INVALID_PASSWORD",
+            error: "Incorrect administrator password. Please verify your password and try again.",
+            wrongPassword: true,
+          },
+          { status: 401 }
+        );
       }
     }
 
-    // 2. Scenario: User ID not found in database -> prompt to register
+    // 2. Look up customer / team member in registered database
+    const user = await userRepository.findByIdentifier(idTrim);
+
     if (!user) {
       recordFailedAttempt(clientIp);
       return NextResponse.json(
@@ -117,14 +170,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 3. Scenario: User found -> Validate password cryptographically
-    const isMasterAdminMatch =
-      expectedAdminUser.length > 0 &&
-      (!isProduction || expectedAdminPass !== "Vikas") &&
-      idTrim.toLowerCase() === expectedAdminUser.toLowerCase() &&
-      pwdTrim === expectedAdminPass;
-
-    const isPasswordValid =
-      isMasterAdminMatch || verifyPassword(pwdTrim, user.salt, user.passwordHash);
+    const isPasswordValid = verifyPassword(pwdTrim, user.salt, user.passwordHash);
 
     // Scenario: Password mismatch -> explicitly call out incorrect password
     if (!isPasswordValid) {
@@ -144,9 +190,7 @@ export async function POST(req: NextRequest) {
     resetRateLimit(clientIp);
 
     let assignedRole: "ARTISAN_ADMIN" | "CUSTOMER" = "CUSTOMER";
-    if (idTrim.toLowerCase() === expectedAdminUser.toLowerCase()) {
-      assignedRole = "ARTISAN_ADMIN";
-    } else if (user.role === "ARTISAN_ADMIN") {
+    if (user.role === "ARTISAN_ADMIN") {
       assignedRole = "ARTISAN_ADMIN";
     } else {
       assignedRole = "CUSTOMER";

@@ -74,12 +74,18 @@ export interface OrderRecord {
 const ORDERS_FILE = path.join(process.cwd(), "src", "data", "orders.json");
 
 function ensureFile(): void {
-  const dir = path.dirname(ORDERS_FILE);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  if (!fs.existsSync(ORDERS_FILE)) {
-    fs.writeFileSync(ORDERS_FILE, JSON.stringify([], null, 2), "utf-8");
+  try {
+    const dir = path.dirname(ORDERS_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    if (!fs.existsSync(ORDERS_FILE)) {
+      fs.writeFileSync(ORDERS_FILE, JSON.stringify([], null, 2), "utf-8");
+    }
+  } catch (err: any) {
+    if (err.code !== "EROFS") {
+      console.warn("[orderRepository] ensureFile non-critical warning:", err.message);
+    }
   }
 }
 

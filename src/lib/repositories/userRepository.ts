@@ -112,21 +112,21 @@ export class FileUserRepository implements UserRepository {
   }
 
   private ensureFileExists(): void {
-    const dir = path.dirname(this.filePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-
-    if (!fs.existsSync(this.filePath)) {
-      fs.writeFileSync(
-        this.filePath,
-        JSON.stringify(this.getDefaultUsers(), null, 2),
-        "utf-8"
-      );
-      return;
-    }
-
     try {
+      const dir = path.dirname(this.filePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+
+      if (!fs.existsSync(this.filePath)) {
+        fs.writeFileSync(
+          this.filePath,
+          JSON.stringify(this.getDefaultUsers(), null, 2),
+          "utf-8"
+        );
+        return;
+      }
+
       const raw = fs.readFileSync(this.filePath, "utf-8").trim();
       if (!raw) {
         fs.writeFileSync(
@@ -135,12 +135,10 @@ export class FileUserRepository implements UserRepository {
           "utf-8"
         );
       }
-    } catch {
-      fs.writeFileSync(
-        this.filePath,
-        JSON.stringify(this.getDefaultUsers(), null, 2),
-        "utf-8"
-      );
+    } catch (err: any) {
+      if (err.code !== "EROFS") {
+        console.warn("[FileUserRepository] ensureFileExists non-critical warning:", err.message);
+      }
     }
   }
 
