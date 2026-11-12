@@ -421,7 +421,7 @@ export default function CheckoutPage() {
                     Billing Address
                   </h3>
                   <p className="text-xs text-brand-charcoal/60 mt-1">
-                    Confirm your billing address for order records and tax invoices.
+                    Confirm your billing address for order records and delivery confirmation.
                   </p>
                 </div>
 
@@ -620,7 +620,7 @@ export default function CheckoutPage() {
                     onClick={() => setStep(2)}
                     className="text-xs font-bold text-slate-500 hover:text-brand-emerald"
                   >
-                    ⬅ Back to Tax & Billing
+                    ⬅ Back to Billing Address
                   </button>
                   <button
                     onClick={handlePlaceOrder}
@@ -721,7 +721,7 @@ export default function CheckoutPage() {
               </div>
 
               <p className="text-[10px] text-slate-400 text-right">
-                Includes ₹{cart.getTaxAmount()} GST (18%) under HSN 3926
+                All inclusive of packaging &amp; studio preparation
               </p>
             </div>
 

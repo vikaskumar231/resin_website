@@ -71,7 +71,7 @@ export default function OrderTrackingPage({ params }: TrackPageProps) {
               className="inline-flex items-center gap-1.5 text-brand-emerald font-bold hover:underline"
             >
               <FileText className="w-3.5 h-3.5 text-brand-teal" />
-              <span>Download Tax Invoice</span>
+              <span>Download Order Receipt</span>
             </Link>
           )}
         </div>

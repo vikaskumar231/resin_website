@@ -468,7 +468,7 @@ Transparent, reassuring consultation hub where customer and artisan collaborate 
 
 ### Screen 6.1: Customer Account Hub & "My Orders" Tracker (`/account/orders`)
 
-Dedicated portal for logged-in shoppers to view active handcrafted pieces, connect with the artisan, and access GST tax invoices:
+Dedicated portal for logged-in shoppers to view active handcrafted pieces, connect with the artisan, and access order receipts:
 
 ```
 ┌────────────────────────────────────────────────────────┐
@@ -487,7 +487,7 @@ Dedicated portal for logged-in shoppers to view active handcrafted pieces, conne
 │  Stage Status: 🟡 In Discussion & Workshop Production  │
 │  (Delivery Date & Price to be finalized on WhatsApp)   │
 │                                                        │
-│  [ 🔍 Order Status & Details ]  [ 📄 View Tax Invoice ]│
+│  [ 🔍 Order Status & Details ]  [ 📄 Order Receipt ]   │
 │  [ 💬 Chat on WhatsApp (Date & Price) ]                │
 ├────────────────────────────────────────────────────────┤
 │  Order #ART-2026-1050                      ₹448        │
@@ -498,7 +498,7 @@ Dedicated portal for logged-in shoppers to view active handcrafted pieces, conne
 │                                                        │
 │  Stage Status: 🟢 Delivered                            │
 │                                                        │
-│  [ 🔍 Order Status & Details ]  [ 📄 View Tax Invoice ]│
+│  [ 🔍 Order Status & Details ]  [ 📄 Order Receipt ]   │
 └────────────────────────────────────────────────────────┘
 ```
 

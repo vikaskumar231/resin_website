@@ -165,7 +165,7 @@ export default function CustomerOrdersPage() {
               {user ? `Namaste, ${user.name}` : "My Orders"}
             </h1>
             <p className="text-xs sm:text-sm text-brand-charcoal/70">
-              {user?.email || "Review your custom creations, WhatsApp consultation status, and official GST tax invoices."}
+              {user?.email || "Review your custom creations, WhatsApp consultation status, and order receipts."}
               {user?.phone ? ` • ${user.phone}` : ""}
             </p>
           </div>
@@ -206,7 +206,7 @@ export default function CustomerOrdersPage() {
             <div className="flex items-center gap-3">
               <AlertCircle className="w-5 h-5 text-brand-gold shrink-0" />
               <p className="text-xs text-brand-charcoal/80">
-                Sign in to view your complete order history, download tax invoices, and connect with the artisan on WhatsApp for proof and delivery coordination.
+                Sign in to view your complete order history, view order receipts, and connect with the artisan on WhatsApp for proof and delivery coordination.
               </p>
             </div>
             <button
@@ -424,7 +424,7 @@ export default function CustomerOrdersPage() {
                         className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-brand-sand hover:bg-brand-sand/80 text-brand-emerald font-semibold text-xs border border-brand-gold/30 transition-colors"
                       >
                         <FileText className="w-3.5 h-3.5 text-brand-teal" />
-                        <span>GST Tax Invoice</span>
+                        <span>Order Receipt</span>
                       </Link>
                     )}
                   </div>

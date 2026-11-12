@@ -208,9 +208,25 @@ export default function NameplateControls() {
               />
             </div>
           </div>
-          <p className="text-[11px] text-slate-500 italic">
-            ✨ Laser-precision cut in mirror gold 3D acrylic and sealed with waterproof artisan resin.
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1">
+            <p className="text-[11px] text-slate-500 italic">
+              ✨ Laser-precision cut in mirror gold 3D acrylic and sealed with waterproof artisan resin.
+            </p>
+            {Boolean(store.nameplate.typography.line1 || store.nameplate.typography.line2) && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                <Check className="w-3 h-3 text-emerald-600" />
+                Active on Artisan Preview
+              </span>
+            )}
+          </div>
+
+          {/* Real-time override assurance card */}
+          <div className="flex items-start gap-2.5 px-3.5 py-2.5 bg-emerald-50/80 border border-emerald-200/70 rounded-2xl text-[11px] text-emerald-900 shadow-2xs">
+            <Sparkles className="w-3.5 h-3.5 text-brand-gold shrink-0 mt-0.5" />
+            <span>
+              <strong>Live Artisan Preview:</strong> Your custom family name and house number seamlessly replace the sample photo inscription in the preview above, positioned in the focal center in 3D mirror acrylic.
+            </span>
+          </div>
         </section>
 
         {/* SECTION 2: DESCRIBE REQUIREMENTS */}

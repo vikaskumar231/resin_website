@@ -226,7 +226,7 @@ export const useCartStore = create<CartStore>()(
       },
 
       getTaxAmount: () => {
-        // GST (18%) is inclusive in all displayed prices in accordance with Indian MRP laws
+        // Applicable taxes are inclusive in all displayed handcrafted prices
         const taxableTotal = get().getSubtotal() - get().getDiscountAmount();
         return Math.round((taxableTotal * 18) / 118);
       },

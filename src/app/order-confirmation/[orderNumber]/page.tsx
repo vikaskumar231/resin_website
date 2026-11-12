@@ -76,7 +76,7 @@ export default function OrderConfirmationPage({ params }: OrderConfirmationPageP
               href="/account/orders"
               className="w-full sm:w-auto px-7 py-3 rounded-full bg-brand-emerald hover:bg-brand-teal text-white font-bold text-xs uppercase tracking-wider shadow-sm transition-all text-center"
             >
-              <span>View My Orders &amp; Invoices</span>
+              <span>View My Orders</span>
             </Link>
 
             <Link

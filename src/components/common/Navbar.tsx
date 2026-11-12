@@ -157,7 +157,7 @@ export default function Navbar() {
                         className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-brand-charcoal hover:bg-brand-emerald/10 hover:text-brand-emerald transition-colors"
                       >
                         <Package className="w-4 h-4 text-brand-teal" />
-                        <span>My Orders &amp; Invoices</span>
+                        <span>My Orders</span>
                       </Link>
 
                       <button
@@ -354,7 +354,7 @@ export default function Navbar() {
                       className="p-2 rounded-xl bg-brand-sand/60 text-brand-emerald font-semibold flex items-center gap-2 text-xs"
                     >
                       <Package className="w-4 h-4 text-brand-teal" />
-                      <span>My Orders &amp; Invoices</span>
+                      <span>My Orders</span>
                     </Link>
                   </div>
                 )}

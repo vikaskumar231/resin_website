@@ -40,8 +40,8 @@
 | Area Audited | Identified Gap in v2.0 | Architectural & Business Solution (v3.0) | User Story Added |
 | :--- | :--- | :--- | :--- |
 | **Guest Checkout** | Forcing registration before checkout increases mobile drop-off by 35%. | Enable 1-click **Guest Checkout** with phone number; auto-link past guest orders when the user subsequently registers with that phone. | `US-3.6` |
-| **Order Summary & Billing** | Gifting orders lacked separate Billing vs. Shipping address handling. | Comprehensive pre-payment Order Summary screen with explicit *"Bill to me, Ship to Recipient"* toggle and GST breakdown. | `US-3.7` |
-| **GST Tax Invoices** | Missing legal Indian invoice requirements (HSN codes, CGST/SGST/IGST). | Asynchronous **Automated GST Tax Invoice Generator** producing signed PDF with HSN 3926/4420, QR code, and consumer tax breakdown. | `US-3.8` |
+| **Order Summary & Billing** | Gifting orders lacked separate Billing vs. Shipping address handling. | Comprehensive pre-payment Order Summary screen with explicit *"Bill to me, Ship to Recipient"* toggle. | `US-3.7` |
+| **Artisan Order Receipts** | Customers need clear proof of purchase and order summary. | Official **Artisan Order Receipt** producing printable proof of purchase with workshop contact and bespoke order details. | `US-3.8` |
 | **Promotions & Coupons** | No mechanism for marketing campaigns, influencer codes, or free shipping. | Server-side **Coupon & Promotional Engine** (percentage/flat discounts, minimum order value, dynamic free shipping threshold ₹999). | `US-3.9` |
 | **Cancellations & Refunds** | Custom resin cannot be refunded after pouring; no explicit policy in place. | Policy-enforced **Order Cancellation & Refund Engine**: Instant cancellation allowed before "In Production"; restricted once resin is poured. | `US-3.10` |
 | **Social Proof & Reviews** | Customers hesitate to buy handmade resin without seeing real photos. | **Verified Buyer Reviews & Photo Testimonials** module with automatic post-delivery WhatsApp review requests and star ratings. | `US-2.4` |
@@ -61,7 +61,7 @@
     [EPIC 0: Auth]    [EPIC 1: Customizer]    [EPIC 2: Catalog]       [EPIC 3: Checkout] [EPIC 4: Proof]
     • Phone OTP/Email • Konva 2D Engine       • Mobile-First PDPs     • Guest Checkout   • WhatsApp Loop
     • RBAC Guard      • Layer Stacking        • Disclaimers & Care    • Razorpay UPI     • Skip / Upload
-    • Address Book    • 300 DPI Export        • Reviews & Search      • GST Tax Invoice  • 1-Click Signoff
+    • Address Book    • 300 DPI Export        • Reviews & Search      • Order Receipt    • 1-Click Signoff
          │                  │                       │                       │                  │
          └──────────────────┼───────────────────────┴───────────────────────┼──────────────────┘
                             ▼                                               ▼
@@ -158,17 +158,17 @@ Scenario: Customer registers with Google OAuth
 
 ---
 
-### Story 0.4: Customer Account Hub (Address Book, Orders & Tax Invoices)
+### Story 0.4: Customer Account Hub (Address Book, Orders & Receipts)
 - **ID:** `US-0.4` | **FR Reference:** `FR-AUTH-04`
 - **As a:** Logged-in customer
-- **I want to:** Manage multiple saved delivery addresses (Home, Office, Parents), view past orders with live status badges, and download official PDF GST invoices
+- **I want to:** Manage multiple saved delivery addresses (Home, Office, Parents), view past orders with live status badges, and view/download official electronic order receipts
 - **So that:** Reordering is instant and I have formal records of my purchases.
 
 #### Acceptance Criteria
 - **AC 0.4.1:** Address book allows adding, editing, and deleting addresses with fields: Full Name, 10-digit Phone, Street Address, Landmark, City, State, and 6-digit PIN code.
 - **AC 0.4.2:** PIN code field auto-populates City and State using the Postal Pincode Directory API.
 - **AC 0.4.3:** Order history page (`/account/orders`) lists past orders with: Order Number (e.g. `ART-2026-1049`), Date, Thumbnail, Total Amount, Customization summary, and Status Pill (`Proof Pending`, `Stage 4: Slow Dust-Free Resin Curing`, `Delivered`).
-- **AC 0.4.4:** Each completed order provides a `[📄 View GST Tax Invoice]` button generating an official PDF with Artआलय's GSTIN and state tax breakup (CGST/SGST/IGST).
+- **AC 0.4.4:** Each completed order provides a `[📄 Order Receipt]` button generating an official printable receipt with Artआलय's studio contact and bespoke commission details.
 - **AC 0.4.5 (Interactive Customer Header Dropdown):** Clicking the logged-in customer pill in the Navbar reveals a dropdown with "My Orders" (`/account/orders`), direct live tracking links, and "Sign Out".
 - **AC 0.4.6 (Universal Track Order Modal & Navigation):** The Navbar provides a visible "Track Order" trigger opening a fast Order # lookup modal allowing both authenticated and guest shoppers to input their order reference and jump straight to their live 6-stage curing radar.
 
@@ -458,7 +458,7 @@ As a visitor to Artआलय, I want an inspiring, culturally resonant, mobile-f
 ## 5. EPIC-3: Frictionless Indian D2C Cart, Checkout & Invoicing
 
 ### Epic Description
-As an Indian consumer, I want a lightning-fast checkout supporting guest checkout, instant UPI app redirection, separate billing/shipping addresses, GST-compliant tax invoices, and coupon codes, so that checkout takes less than 45 seconds without frustrating hurdles.
+As an Indian consumer, I want a lightning-fast checkout supporting guest checkout, instant UPI app redirection, separate billing/shipping addresses, electronic order receipts, and coupon codes, so that checkout takes less than 45 seconds without frustrating hurdles.
 
 ---
 
@@ -561,7 +561,7 @@ As an Indian consumer, I want a lightning-fast checkout supporting guest checkou
   - GST Tax breakdown (CGST 9% + SGST 9% for intra-state Karnataka, or IGST 18% for inter-state).
   - Grand Total in bold INR (₹).
 - **AC 3.7.2:** Checkbox: `[Billing address is different from shipping address]`. When checked, displays separate billing address form.
-- **AC 3.7.3:** Consumer (B2C) Invoicing: The option for customers to claim B2B GST Input Tax Credit (ITC) has been removed. All customer orders are issued standard B2C consumer tax invoices with Artआलय's seller GSTIN under HSN 3926/4420.
+- **AC 3.7.3:** Consumer Invoicing & Receipts: The option for customers to claim B2B GST Input Tax Credit (ITC) and statutory GST tax invoices has been removed. All customer orders are issued clean electronic Order Receipts for handcrafted bespoke items without complex GSTIN / HSN tax breakdown.
 - **AC 3.7.4 (Flexible Delivery Target Date & Customer Reason):**
   - Checkout provides an optional target delivery scheduling card: `Do you need this creation by a specific date? (e.g. Wedding, Housewarming, Birthday, Anniversary)`.
   - Customer can specify `neededByDate` (ISO Date) and `neededByReason` (text up to 200 chars).
@@ -570,22 +570,22 @@ As an Indian consumer, I want a lightning-fast checkout supporting guest checkou
 
 ---
 
-### Story 3.8: Automated GST Tax Invoice Generation & HSN Engine
+### Story 3.8: Electronic Order Receipt & Handcrafted Purchase Summary
 - **ID:** `US-3.8` | **FR Reference:** `FR-CHK-08`
-- **As a:** Customer and Platform Accountant
-- **I want:** The system to automatically generate an official, legally compliant GST Tax Invoice PDF upon payment completion
-- **So that:** Customers have a formal tax receipt and the business complies with Indian tax authority regulations.
+- **As a:** Customer and Platform Administrator
+- **I want:** The system to provide a clean, official electronic Order Receipt upon payment completion
+- **So that:** Customers have formal proof of purchase, order confirmation, and clear WhatsApp coordination instructions without complex statutory GST invoice clutter.
 
 #### Acceptance Criteria
-- **AC 3.8.1:** Invoice PDF is generated asynchronously upon `ORDER_CONFIRMED` using `@react-pdf/renderer` and saved to Cloudinary/S3.
-- **AC 3.8.2:** Invoice complies with GST rules, containing:
-  - Consecutive Financial Year Invoice Number (e.g. `AA/26-27/0042`).
-  - Artआलय registered business name, studio address, and 15-digit GSTIN.
-  - Customer Name, Shipping Address, and Billing Address (Consumer B2C Tax Invoicing).
-  - Date of Invoice and Place of Supply (Customer State).
-  - HSN Classification: **HSN 3926** (Decorative resin/plastic goods) and **HSN 4420** (Wood-inlaid resin nameplates).
-  - Tax Table detailing Taxable Value, CGST (9%), SGST (9%), or IGST (18%).
-- **AC 3.8.3:** PDF link is emailed/WhatsApped to customer and available for download in Customer Account Hub and Admin Order Card.
+- **AC 3.8.1:** Order Receipt is generated upon order confirmation and accessible via `/invoices/[id]`.
+- **AC 3.8.2:** Receipt contains:
+  - Consecutive Order/Receipt Reference Number (e.g. `REC-2026-00042`).
+  - Artआलय studio name, workshop address, contact email, and support WhatsApp.
+  - Customer Name, Shipping Address, and Contact Number.
+  - Date of Order and Payment Transaction Status (PAID via UPI/Razorpay).
+  - Itemized handcrafted goods description, custom dimensions/notes, and unit prices.
+  - Packaging & Courier handover summary.
+- **AC 3.8.3:** Printable/PDF format is available for download in Customer Account Hub and Tracking views.
 
 ---
 

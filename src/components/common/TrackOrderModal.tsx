@@ -57,7 +57,7 @@ export default function TrackOrderModal({ isOpen, onClose }: TrackOrderModalProp
         </div>
 
         <p className="text-xs text-brand-charcoal/70 leading-relaxed">
-          Enter your unique order reference code from your confirmation screen or WhatsApp message to check your order status, download tax invoices, and connect directly with our artist to finalize delivery dates and design details.
+          Enter your unique order reference code from your confirmation screen or WhatsApp message to check your order status, view order receipts, and connect directly with our artist to finalize delivery dates and design details.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
