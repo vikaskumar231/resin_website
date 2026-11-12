@@ -118,15 +118,54 @@ export default function KeyringCanvas() {
       ctx.fillStyle = hw.hex;
       ctx.fillText(store.keyring.letter || "A", 900, 1120);
 
-      // Tag (If engraved)
-      if (store.keyring.hasEngravedTag && store.keyring.engravedText) {
-        ctx.fillStyle = hw.hex;
+      // Tag (If engraved) - realistically attached to hardware chain connector
+      if (store.keyring.hasEngravedTag) {
+        const textToDraw = store.keyring.engravedText || "YOUR NAME";
+        ctx.save();
+
+        // 1. Jump ring from lower chain (900, 590) to charm tag grommet (1040, 620)
+        ctx.strokeStyle = hw.hex;
+        ctx.lineWidth = 14;
         ctx.beginPath();
-        ctx.arc(1250, 680, 100, 0, Math.PI * 2);
+        ctx.moveTo(900, 590);
+        ctx.lineTo(1040, 620);
+        ctx.stroke();
+
+        // 2. Charm disc shadow
+        ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+        ctx.beginPath();
+        ctx.arc(1135, 705, 110, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = "#FFFFFF";
-        ctx.font = "bold 44px sans-serif";
-        ctx.fillText(store.keyring.engravedText, 1250, 680);
+
+        // 3. Charm disc radial gold gradient
+        const tagGrad = ctx.createRadialGradient(1110, 680, 20, 1130, 700, 110);
+        tagGrad.addColorStop(0, "#FFFBEA");
+        tagGrad.addColorStop(0.3, "#F5DE88");
+        tagGrad.addColorStop(0.65, "#D4AF37");
+        tagGrad.addColorStop(1, "#78350F");
+        ctx.fillStyle = tagGrad;
+        ctx.beginPath();
+        ctx.arc(1130, 700, 110, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 4. Charm disc gold border
+        ctx.strokeStyle = "#FEF3C7";
+        ctx.lineWidth = 8;
+        ctx.stroke();
+
+        // 5. Top grommet hole
+        ctx.fillStyle = "#1C1917";
+        ctx.beginPath();
+        ctx.arc(1060, 630, 14, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 6. Laser-etched text
+        ctx.fillStyle = "#2C1810";
+        ctx.font = "bold 44px 'Playfair Display', serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(textToDraw, 1130, 710);
+        ctx.restore();
       }
 
       // Studio Proof Watermark
@@ -231,6 +270,21 @@ export default function KeyringCanvas() {
           </div>
         )}
 
+        {/* Floating Laser Engraved Tag Callout Badge */}
+        {store.keyring.hasEngravedTag && (
+          <div className="absolute top-4 right-4 z-30 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-brand-gold/70 shadow-lg animate-in fade-in slide-in-from-top-1">
+            <span className="w-2 h-2 rounded-full bg-brand-gold animate-pulse shrink-0" />
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 font-sans">
+                Engraved Tag:
+              </span>
+              <span className="text-[11px] font-extrabold text-white font-mono tracking-wide">
+                &ldquo;{store.keyring.engravedText || "Your Name"}&rdquo;
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* 1. Metal Key Loop Hardware on Top */}
         <div className="relative z-20 flex flex-col items-center -mt-6 sm:-mt-8">
           {/* Main Key Split Ring */}
@@ -244,33 +298,71 @@ export default function KeyringCanvas() {
             <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-brand-ivory border-2 border-black/10 shadow-inner" />
           </div>
 
-          {/* Connector Chain Links */}
-          <div className="flex flex-col items-center -space-y-1 my-1">
+          {/* Connector Chain Links & Hanging Charm Anchor */}
+          <div className="relative flex flex-col items-center -space-y-1 my-1">
+            {/* Upper Chain Link */}
             <div
               style={{ background: hw.gradient }}
               className="w-3.5 h-5 rounded-full border border-black/20 shadow-sm"
             />
-            <div
-              style={{ background: hw.gradient }}
-              className="w-3.5 h-5 rounded-full border border-black/20 shadow-sm"
-            />
-          </div>
-        </div>
 
-        {/* Optional Laser-Engraved Circular Tag */}
-        {store.keyring.hasEngravedTag && store.keyring.engravedText && (
-          <div className="absolute top-[36%] left-[16%] sm:left-[20%] z-25 flex flex-col items-center">
-            <div style={{ background: hw.gradient }} className="w-0.5 h-6" />
-            <div
-              style={{ background: hw.gradient }}
-              className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-white/80 shadow-md flex items-center justify-center p-1 text-center"
-            >
-              <span className="font-sans font-bold text-[10px] sm:text-xs text-white uppercase tracking-wider drop-shadow">
-                {store.keyring.engravedText}
-              </span>
+            {/* Lower Chain Link with Jump Ring & Engraved Charm Tag */}
+            <div className="relative flex items-center justify-center">
+              <div
+                style={{ background: hw.gradient }}
+                className="w-3.5 h-5 rounded-full border border-black/20 shadow-sm"
+              />
+
+              {/* Physical Laser-Engraved Charm Tag Attached to Chain */}
+              {store.keyring.hasEngravedTag && (
+                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-1 flex items-center z-30 pointer-events-none animate-in fade-in zoom-in-95 duration-200">
+                  {/* Angled Golden Jump Ring Link */}
+                  <div className="relative flex items-center">
+                    <div
+                      style={{ background: hw.gradient }}
+                      className="w-5 h-2.5 rounded-full border border-amber-900/40 shadow-xs rotate-[-15deg] origin-left"
+                    />
+
+                    {/* Laser-Engraved Polished Brass Disc Tag */}
+                    <div
+                      style={{
+                        background:
+                          "radial-gradient(circle at 35% 35%, #FFFBEA 0%, #F5DE88 25%, #D4AF37 55%, #996515 85%, #593E10 100%)",
+                        boxShadow:
+                          "0 6px 16px rgba(0,0,0,0.45), 0 2px 4px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.9), inset 0 -1px 2px rgba(0,0,0,0.5)",
+                      }}
+                      className="relative -ml-1 w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-amber-100 flex flex-col items-center justify-center p-1 shadow-xl rotate-[8deg] transition-all"
+                    >
+                      {/* Top Attachment Grommet Hole */}
+                      <div className="absolute top-1 w-2 h-2 rounded-full bg-stone-900/70 border border-amber-200 shadow-inner" />
+
+                      {/* Concentric Brushed Ring Guide */}
+                      <div className="absolute inset-1.5 rounded-full border border-amber-800/20 pointer-events-none" />
+
+                      {/* Laser-Etched Engraved Text */}
+                      <span
+                        style={{
+                          textShadow:
+                            "0 1px 0 rgba(255,255,255,0.4), 0 -1px 1px rgba(0,0,0,0.6)",
+                        }}
+                        className={`font-serif font-black text-center uppercase tracking-wider select-none px-1 leading-tight ${
+                          store.keyring.engravedText
+                            ? "text-amber-950 text-[10px] sm:text-xs"
+                            : "text-amber-900/50 italic text-[9px] sm:text-[10px]"
+                        }`}
+                      >
+                        {store.keyring.engravedText || "YOUR NAME"}
+                      </span>
+
+                      {/* Optical Shine Reflection */}
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/20 to-white/60 pointer-events-none" />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        )}
+        </div>
 
         {/* 2. Central 3D Crystal Monogram Letter */}
         <div className="relative z-10 flex items-center justify-center mt-2 group">

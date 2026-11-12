@@ -15,7 +15,6 @@ import {
   ChevronDown,
   LogOut,
   Tag,
-  ClipboardList,
   FolderTree,
   User,
   Truck,
@@ -221,16 +220,6 @@ export default function Navbar() {
                     Catalog CMS
                   </Link>
 
-                  <Link
-                    href="/admin/orders/ord_01/job-sheet"
-                    prefetch={false}
-                    onClick={() => setAdminDropdownOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-brand-charcoal hover:bg-brand-emerald/10 hover:text-brand-emerald transition-colors"
-                  >
-                    <ClipboardList className="w-4 h-4 text-brand-teal" />
-                    Order Job Sheet
-                  </Link>
-
                   <div className="border-t border-brand-sand/60 mt-1 pt-1">
                     <button
                       onClick={() => {
@@ -337,12 +326,12 @@ export default function Navbar() {
                 </div>
 
                 {isArtisanAdmin ? (
-                  <div className="pt-2 border-t border-brand-sand grid grid-cols-3 gap-1.5 text-[11px]">
+                  <div className="pt-2 border-t border-brand-sand grid grid-cols-2 gap-2 text-[11px]">
                     <Link
                       href="/admin/categories"
                       prefetch={false}
                       onClick={() => setMobileMenuOpen(false)}
-                      className="p-2 rounded-xl bg-brand-sand/60 text-brand-emerald font-semibold flex items-center justify-center gap-1 text-center"
+                      className="p-2.5 rounded-xl bg-brand-sand/60 text-brand-emerald font-semibold flex items-center justify-center gap-1.5 text-center"
                     >
                       <FolderTree className="w-3.5 h-3.5 text-brand-teal shrink-0" />
                       <span>Categories</span>
@@ -351,19 +340,10 @@ export default function Navbar() {
                       href="/admin/products"
                       prefetch={false}
                       onClick={() => setMobileMenuOpen(false)}
-                      className="p-2 rounded-xl bg-brand-sand/60 text-brand-emerald font-semibold flex items-center justify-center gap-1 text-center"
+                      className="p-2.5 rounded-xl bg-brand-sand/60 text-brand-emerald font-semibold flex items-center justify-center gap-1.5 text-center"
                     >
                       <Tag className="w-3.5 h-3.5 text-brand-teal shrink-0" />
-                      <span>Catalog</span>
-                    </Link>
-                    <Link
-                      href="/admin/orders/ord_01/job-sheet"
-                      prefetch={false}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="p-2 rounded-xl bg-brand-sand/60 text-brand-emerald font-semibold flex items-center justify-center gap-1 text-center"
-                    >
-                      <ClipboardList className="w-3.5 h-3.5 text-brand-teal shrink-0" />
-                      <span>Job Sheet</span>
+                      <span>Catalog CMS</span>
                     </Link>
                   </div>
                 ) : (

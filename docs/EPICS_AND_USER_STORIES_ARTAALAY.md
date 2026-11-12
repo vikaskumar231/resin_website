@@ -116,7 +116,7 @@ Scenario: Customer registers with Google OAuth
   - Clicking either CTA opens the unified `AuthModal` with the corresponding tab pre-selected, or navigates to `/login`.
   - When a user is authenticated, the header transforms dynamically:
     - Standard Customer: Displays user's first name, avatar initial, and account dropdown with "Sign Out".
-    - Artisan Administrator (`ARTISAN_ADMIN`): Displays a prominent emerald-and-gold **"👑 Artisan Admin"** pill with quick-access links to `/admin/products` (Catalog CMS) and `/admin/orders/[id]/job-sheet` (Workshop Kanban and Resin Inventory are tracked offline by the artist).
+    - Artisan Administrator (`ARTISAN_ADMIN`): Displays a prominent emerald-and-gold **"👑 Artisan Admin"** pill with quick-access links to `/admin/categories` (Categories CMS) and `/admin/products` (Catalog CMS) (Workshop Kanban, Resin Inventory, and Job Sheets are tracked offline by the artist).
 
 ---
 
@@ -134,7 +134,7 @@ Scenario: Customer registers with Google OAuth
   - Password: `Vikas`
   - Name: `Vikas Kumar (Master Artisan)`
   - Role: `ARTISAN_ADMIN`
-  - Logging in with these credentials immediately unlocks all Admin Studio screens (`/admin/products`, `/admin/orders/[id]/job-sheet`), sets the `art_aalay_role=ARTISAN_ADMIN` cookie, and reveals the Artisan Admin workspace pill in the global header (Workshop Kanban and Resin Inventory links removed as they are tracked offline by the artist).
+  - Logging in with these credentials immediately unlocks all Admin Studio screens (`/admin/categories`, `/admin/products`), sets the `art_aalay_role=ARTISAN_ADMIN` cookie, and reveals the Artisan Admin workspace pill in the global header (Workshop Kanban, Resin Inventory, and Job Sheet links removed as they are tracked offline by the artist).
 - **AC 0.2.4:** **Zero Public Admin Visibility & Dynamic Role Assignment:** All public customer interfaces, including `AuthModal` and `/login`, must present a clean, standard authentication form without any visible admin bypass cards, pre-filled demo credentials, or one-click access buttons. The `ARTISAN_ADMIN` role is determined dynamically by the system solely upon authenticated login with valid administrator credentials.
 - **AC 0.2.5:** Session tokens persist across browser refreshes via `useAuthStore` localStorage and cookie sync; remember-me toggle supported.
 - **AC 0.2.6 (Production Security Hardening Gate):**

@@ -7,7 +7,6 @@ import Footer from "@/components/common/Footer";
 import BatchVolumeCalculator from "@/components/admin/BatchVolumeCalculator";
 import { useAuthStore } from "@/store/useAuthStore";
 import {
-  Printer,
   CheckCircle2,
   Clock,
   Sparkles,
@@ -211,20 +210,12 @@ export default function WorkshopKanbanPage() {
                         </div>
 
                         {/* Action buttons */}
-                        <div className="pt-2 border-t border-brand-sand/60 flex items-center justify-between gap-2">
-                          <Link
-                            href={`/admin/orders/${card.id}/job-sheet`}
-                            className="p-1.5 rounded-lg border border-brand-sand hover:bg-brand-sand text-slate-600"
-                            title="Print Workshop Job Sheet (A4)"
-                          >
-                            <Printer className="w-3.5 h-3.5" />
-                          </Link>
-
+                        <div className="pt-2 border-t border-brand-sand/60 flex items-center justify-end">
                           <button
                             onClick={() => advanceStage(card.id)}
-                            className="flex-1 py-1 px-2 rounded-lg bg-brand-emerald text-white text-[10px] font-bold hover:bg-brand-teal transition-all flex items-center justify-center gap-1"
+                            className="w-full py-1.5 px-3 rounded-lg bg-brand-emerald text-white text-[10px] font-bold hover:bg-brand-teal transition-all flex items-center justify-center gap-1 shadow-xs"
                           >
-                            <span>Advance</span>
+                            <span>Advance Stage</span>
                             <ArrowRight className="w-3 h-3" />
                           </button>
                         </div>

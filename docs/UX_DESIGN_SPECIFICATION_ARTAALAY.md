@@ -170,13 +170,13 @@ When browsing the catalog, a floating glassmorphic bottom navigation dock stays 
       - High-contrast pill button: **`Register`** (`bg-brand-sand border border-brand-emerald text-brand-emerald font-bold rounded-full px-4 py-2 hover:bg-brand-emerald hover:text-white`).
       - Hero CTA: **`Collections`** (`bg-brand-emerald text-white font-bold rounded-full px-5 py-2.5` linking to `/#catalog`).
       - Bag icon with floating badge counter.
-    - **Logged-In (Artisan Admin `Vikas`):**
-      - Radiant golden-emerald pill badge: **`👑 Vikas • Artisan Admin ▼`**
+    - **Logged-In (Artisan Admin):**
+      - Radiant golden-emerald pill badge: **`👑 Artisan Admin ▼`**
       - Dropdown menu options:
-        - 🏷️ **Product Catalog** (`/admin/products`)
-        - 📋 **Order Job Sheets** (`/admin/orders/ord_01/job-sheet`)
+        - 📂 **Categories CMS** (`/admin/categories`)
+        - 🏷️ **Product Catalog CMS** (`/admin/products`)
         - 🚪 **Sign Out**
-        *(Note: Workshop Kanban and Resin Inventory are tracked offline by the artist and removed from navigation).*
+        *(Note: Workshop Kanban, Resin Inventory, and Job Sheets are tracked offline by the artist and removed from navigation).*
 * **Hero Section ("The Aesthetic Hook & Multi-Craft Showcase"):**
   - **Left Value Proposition Column:**
     - Headline: *"Handmade & Custom Resin Art, Tailored in Discussion with Our Artist"*.

@@ -187,6 +187,10 @@ export default function KeyringControls() {
                   placeholder="e.g. Priya, Kabir, 14.02"
                   className="w-full px-3.5 py-2 rounded-xl border border-brand-sand bg-white text-xs font-semibold text-brand-charcoal focus:ring-2 focus:ring-brand-gold focus:outline-none"
                 />
+                <p className="text-[10px] text-brand-emerald font-medium flex items-center gap-1.5 pt-0.5">
+                  <Sparkles className="w-3 h-3 text-brand-gold shrink-0" />
+                  <span>Depicted in real-time on the polished gold charm tag hanging beside the keychain loop above.</span>
+                </p>
                 {tagError && (
                   <p className="text-[10px] text-rose-600 font-semibold">{tagError}</p>
                 )}
