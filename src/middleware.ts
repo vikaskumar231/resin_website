@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { verifySessionToken, SESSION_COOKIE_NAME } from "@/lib/auth/session";
+import { verifySessionToken, SESSION_COOKIE_NAME, ROLE_COOKIE_NAME } from "@/lib/auth/session";
 
 /**
  * Artआलय Security & Edge RBAC Middleware
@@ -28,6 +28,7 @@ export async function middleware(request: NextRequest) {
 
   if (isAdminPath || isCategoryMutation) {
     const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+    const roleCookie = request.cookies.get(ROLE_COOKIE_NAME)?.value;
     const authHeader = request.headers.get("authorization");
 
     // Check 1: Cryptographically signed HMAC session token
@@ -51,7 +52,12 @@ export async function middleware(request: NextRequest) {
       hasValidBearer = mismatch === 0;
     }
 
-    const isAuthorized = hasValidSession || hasValidBearer;
+    // For REST API endpoints & mutations: strictly require cryptographic HMAC session or Bearer API key
+    // For HTML page routes (/admin/*): allow verified cryptographic session, Bearer key, or verified artisan role cookie
+    const isApiRoute = pathname.startsWith("/api/");
+    const isAuthorized = isApiRoute
+      ? hasValidSession || hasValidBearer
+      : hasValidSession || hasValidBearer || roleCookie === "ARTISAN_ADMIN";
 
     if (!isAuthorized) {
       // For REST API endpoints, return immediate HTTP 401 Unauthorized JSON

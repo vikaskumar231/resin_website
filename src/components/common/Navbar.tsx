@@ -203,6 +203,7 @@ export default function Navbar() {
 
                   <Link
                     href="/admin/categories"
+                    prefetch={false}
                     onClick={() => setAdminDropdownOpen(false)}
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-brand-charcoal hover:bg-brand-emerald/10 hover:text-brand-emerald transition-colors"
                   >
@@ -212,6 +213,7 @@ export default function Navbar() {
 
                   <Link
                     href="/admin/products"
+                    prefetch={false}
                     onClick={() => setAdminDropdownOpen(false)}
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-brand-charcoal hover:bg-brand-emerald/10 hover:text-brand-emerald transition-colors"
                   >
@@ -221,6 +223,7 @@ export default function Navbar() {
 
                   <Link
                     href="/admin/orders/ord_01/job-sheet"
+                    prefetch={false}
                     onClick={() => setAdminDropdownOpen(false)}
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-brand-charcoal hover:bg-brand-emerald/10 hover:text-brand-emerald transition-colors"
                   >
@@ -337,6 +340,7 @@ export default function Navbar() {
                   <div className="pt-2 border-t border-brand-sand grid grid-cols-3 gap-1.5 text-[11px]">
                     <Link
                       href="/admin/categories"
+                      prefetch={false}
                       onClick={() => setMobileMenuOpen(false)}
                       className="p-2 rounded-xl bg-brand-sand/60 text-brand-emerald font-semibold flex items-center justify-center gap-1 text-center"
                     >
@@ -345,6 +349,7 @@ export default function Navbar() {
                     </Link>
                     <Link
                       href="/admin/products"
+                      prefetch={false}
                       onClick={() => setMobileMenuOpen(false)}
                       className="p-2 rounded-xl bg-brand-sand/60 text-brand-emerald font-semibold flex items-center justify-center gap-1 text-center"
                     >
@@ -353,6 +358,7 @@ export default function Navbar() {
                     </Link>
                     <Link
                       href="/admin/orders/ord_01/job-sheet"
+                      prefetch={false}
                       onClick={() => setMobileMenuOpen(false)}
                       className="p-2 rounded-xl bg-brand-sand/60 text-brand-emerald font-semibold flex items-center justify-center gap-1 text-center"
                     >

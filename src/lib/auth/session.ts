@@ -89,7 +89,12 @@ export async function verifySessionToken(
     return { valid: false, error: "Session token missing" };
   }
 
-  const parts = token.split(".");
+  let cleanToken = token.trim();
+  if (cleanToken.startsWith('"') && cleanToken.endsWith('"')) {
+    cleanToken = cleanToken.slice(1, -1);
+  }
+
+  const parts = cleanToken.split(".");
   if (parts.length !== 4) {
     return { valid: false, error: "Malformed session token format" };
   }

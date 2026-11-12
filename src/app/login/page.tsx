@@ -40,11 +40,15 @@ export default function LoginPage() {
       if (currentUser?.role === "ARTISAN_ADMIN") {
         setSuccessToast(`👑 Welcome Master Artisan ${currentUser.name}! Admin screens unlocked.`);
         const dest = callbackUrl && callbackUrl.startsWith("/admin") ? callbackUrl : "/admin/products";
-        setTimeout(() => router.push(dest), 1000);
+        setTimeout(() => {
+          window.location.href = dest;
+        }, 800);
       } else {
         setSuccessToast(`Welcome back to Artआलय${currentUser?.name ? `, ${currentUser.name}` : ""}!`);
         const dest = callbackUrl && !callbackUrl.startsWith("/admin") ? callbackUrl : "/";
-        setTimeout(() => router.push(dest), 1000);
+        setTimeout(() => {
+          window.location.href = dest;
+        }, 800);
       }
     } else {
       setError(res.error || "Failed to sign in");

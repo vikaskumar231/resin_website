@@ -65,10 +65,15 @@ const PRESET_IMAGES = [
 ];
 
 export default function ArtisanProductsPage() {
+  const [isMounted, setIsMounted] = useState(false);
   const { products, addProduct, updateProduct, updatePrice, updateBadge, deleteProduct, fetchProducts } = useProductStore();
   const { categories, fetchCategories } = useCategoryStore();
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Sync latest products & categories from server disk on mount
   useEffect(() => {
@@ -485,6 +490,19 @@ export default function ArtisanProductsPage() {
         return null;
     }
   };
+
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen bg-brand-ivory text-brand-charcoal flex flex-col selection:bg-brand-gold/30">
+        <Navbar />
+        <main className="flex-1 py-8 sm:py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-6 animate-pulse">
+          <div className="h-10 bg-brand-sand/50 rounded-2xl w-64 mb-6" />
+          <div className="h-64 bg-brand-sand/30 rounded-3xl w-full" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-brand-ivory text-brand-charcoal flex flex-col selection:bg-brand-gold/30">

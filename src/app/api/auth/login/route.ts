@@ -81,6 +81,10 @@ export async function POST(req: NextRequest) {
     const configuredAdminUser = (process.env.ADMIN_USERNAME || "").trim();
     const configuredAdminPass = (process.env.ADMIN_PASSWORD || "").trim();
 
+    // Determine cookie security: always secure on HTTPS, allow HTTP for localhost testing
+    const isHttps = req.nextUrl.protocol === "https:" || req.headers.get("x-forwarded-proto") === "https";
+    const cookieSecure = isHttps || (isProduction && !req.nextUrl.hostname.includes("localhost") && !req.nextUrl.hostname.includes("127.0.0.1"));
+
     // Default fallback: "admin" / "ArtisanAdmin2026!" in production; "Vikas" / "Vikas" in development
     const fallbackAdminUser = isProduction ? "admin" : "Vikas";
     const fallbackAdminPass = isProduction ? "ArtisanAdmin2026!" : "Vikas";
@@ -109,7 +113,11 @@ export async function POST(req: NextRequest) {
         const adminUser = {
           id: "user_master_admin",
           username: expectedAdminUser,
-          name: process.env.ADMIN_NAME || `${expectedAdminUser} (Master Artisan)`,
+          name:
+            process.env.ADMIN_NAME ||
+            (expectedAdminUser.toLowerCase() === "admin"
+              ? "Artisan Administrator"
+              : `${expectedAdminUser} (Master Artisan)`),
           email: process.env.ADMIN_EMAIL || `${expectedAdminUser.toLowerCase()}@artaalay.com`,
           phone: process.env.ADMIN_PHONE || "+91 98765 43210",
           role: "ARTISAN_ADMIN" as const,
@@ -127,7 +135,7 @@ export async function POST(req: NextRequest) {
           httpOnly: true,
           path: "/",
           sameSite: "lax",
-          secure: process.env.NODE_ENV === "production",
+          secure: cookieSecure,
           maxAge: 30 * 24 * 60 * 60,
         });
         res.cookies.set({
@@ -228,7 +236,7 @@ export async function POST(req: NextRequest) {
       httpOnly: true,
       path: "/",
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      secure: cookieSecure,
       maxAge: 30 * 24 * 60 * 60,
     });
 

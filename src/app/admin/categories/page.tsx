@@ -31,10 +31,15 @@ const SUGGESTED_EMOJIS = [
 
 export default function AdminCategoriesPage() {
   const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
   const { user } = useAuthStore();
   const isArtisanAdmin = user?.role === "ARTISAN_ADMIN";
   const { categories, isLoading, error, fetchCategories, addCategory, updateCategory, deleteCategory } =
     useCategoryStore();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -169,6 +174,19 @@ export default function AdminCategoriesPage() {
   });
 
   const totalAssignedProducts = categories.reduce((sum, c) => sum + (c.productCount || 0), 0);
+
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen bg-brand-ivory text-brand-charcoal flex flex-col selection:bg-brand-gold/30">
+        <Navbar />
+        <main className="flex-1 py-8 sm:py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-8 animate-pulse">
+          <div className="h-10 bg-brand-sand/50 rounded-2xl w-64 mb-6" />
+          <div className="h-64 bg-brand-sand/30 rounded-3xl w-full" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-brand-ivory text-brand-charcoal flex flex-col selection:bg-brand-gold/30">

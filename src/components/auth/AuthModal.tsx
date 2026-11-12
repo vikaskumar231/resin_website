@@ -45,11 +45,15 @@ export default function AuthModal() {
         setSuccessToast(`👑 Welcome Master Artisan ${currentUser.name}! Admin screens unlocked.`);
         setTimeout(() => {
           setSuccessToast(null);
-          router.push("/admin/products");
-        }, 1200);
+          closeAuthModal();
+          window.location.href = "/admin/products";
+        }, 800);
       } else {
         setSuccessToast(`Welcome back to Artआलय${currentUser?.name ? `, ${currentUser.name}` : ""}!`);
-        setTimeout(() => setSuccessToast(null), 2000);
+        setTimeout(() => {
+          setSuccessToast(null);
+          closeAuthModal();
+        }, 1500);
       }
     } else {
       setError(res.error || "Failed to sign in");
