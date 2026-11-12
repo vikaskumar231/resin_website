@@ -51,11 +51,6 @@ export async function POST(req: NextRequest) {
     }
 
     const contentType = req.headers.get("content-type") || "";
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-    }
 
     let buffer: Buffer;
     let claimedExt = "jpg";
@@ -134,18 +129,70 @@ export async function POST(req: NextRequest) {
     // 5. Secure Unpredictable Filename (Path Traversal Prevention)
     const randomSuffix = crypto.randomBytes(6).toString("hex");
     const savedFileName = `artisan_${Date.now()}_${randomSuffix}.${normalizedExt}`;
-    const destinationPath = path.join(uploadsDir, savedFileName);
-
-    fs.writeFileSync(destinationPath, buffer);
-
     const sizeInKb = Math.round(buffer.length / 1024);
-    const publicUrl = `/uploads/${savedFileName}`;
+
+    let publicUrl = "";
+    let isEphemeral = false;
+    let warning: string | undefined = undefined;
+
+    // Strategy A: Vercel Blob Storage (Zero-dependency native REST API)
+    // Automatically activated when BLOB_READ_WRITE_TOKEN is configured in Vercel Dashboard
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      try {
+        const contentType = normalizedExt === "jpg" ? "image/jpeg" : `image/${normalizedExt}`;
+        const blobRes = await fetch(
+          `https://blob.vercel-storage.com/uploads/${savedFileName}`,
+          {
+            method: "PUT",
+            headers: {
+              authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
+              "x-api-version": "7",
+              "content-type": contentType,
+            },
+            body: new Uint8Array(buffer),
+          }
+        );
+        if (blobRes.ok) {
+          const blobData = (await blobRes.json()) as { url?: string };
+          if (blobData?.url) {
+            publicUrl = blobData.url;
+          }
+        }
+      } catch (blobErr: any) {
+        console.warn("[Admin Upload] Vercel Blob upload failed, checking fallback:", blobErr.message);
+      }
+    }
+
+    // Strategy B: Local / Docker Static Filesystem Storage (public/uploads)
+    if (!publicUrl) {
+      try {
+        const uploadsDir = path.join(process.cwd(), "public", "uploads");
+        if (!fs.existsSync(uploadsDir)) {
+          fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+        const destinationPath = path.join(uploadsDir, savedFileName);
+        fs.writeFileSync(destinationPath, buffer);
+        publicUrl = `/uploads/${savedFileName}`;
+      } catch (fsErr: any) {
+        // Strategy C: Graceful Serverless Fallback (Base64 Data URL)
+        // If deployed on Vercel without Vercel Blob configured, prevent 500 crash
+        if (fsErr.code === "EROFS" || fsErr.message?.includes("read-only")) {
+          const mimeType = normalizedExt === "jpg" ? "image/jpeg" : `image/${normalizedExt}`;
+          publicUrl = `data:${mimeType};base64,${buffer.toString("base64")}`;
+          isEphemeral = true;
+          warning = "Vercel serverless read-only filesystem detected. Image is served as an inline Data URL. For persistent global CDN hosting, enable Vercel Blob in your Vercel Dashboard.";
+        } else {
+          throw fsErr;
+        }
+      }
+    }
 
     return NextResponse.json({
       success: true,
       url: publicUrl,
       fileName: originalName,
       sizeInKb: `${sizeInKb} KB`,
+      ...(isEphemeral ? { isEphemeral, warning } : {}),
     });
   } catch (error: any) {
     console.error("[API POST /api/admin/upload] Error:", error);

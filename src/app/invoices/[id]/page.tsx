@@ -53,8 +53,8 @@ export default function OrderReceiptPage({ params }: InvoicePageProps) {
       shippingFee: 0.0,
       grandTotal: 2499.0,
       amountInWords: "Two Thousand Four Hundred and Ninety-Nine Rupees Only",
-      paymentMethod: "Razorpay (UPI)",
-      paymentStatus: "PAID (100% Captured)",
+      paymentMethod: "Offline Settlement (Cash / Direct UPI on Delivery)",
+      paymentStatus: "Pending Offline Settlement",
     },
   };
 

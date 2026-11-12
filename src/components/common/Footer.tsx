@@ -87,12 +87,12 @@ export default function Footer() {
 
           <div>
             <h5 className="font-serif text-sm font-bold text-brand-gold uppercase tracking-wider mb-4">
-              Payment & Trust
+              Payment &amp; Trust
             </h5>
             <div className="space-y-2 text-xs text-brand-sand/70">
-              <p>UPI Intent (GPay, PhonePe, Paytm)</p>
-              <p>Debit/Credit Cards & NetBanking via Razorpay</p>
-              <p>Anti-RTO ₹199 advance deposit for customized COD</p>
+              <p>Offline Settlement (Cash on Delivery)</p>
+              <p>Direct UPI (GPay, PhonePe, Paytm)</p>
+              <p>Zero upfront payment required online</p>
             </div>
           </div>
         </div>

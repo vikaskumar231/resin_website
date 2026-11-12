@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { createRazorpayOrder } from "@/lib/payments/razorpay";
 import { productRepository } from "@/lib/repositories/productRepository";
 import { HERO_PRODUCTS } from "@/lib/mockData";
 import { sanitizeLaserText } from "@/lib/sanitizer";
@@ -155,51 +154,21 @@ export async function POST(req: NextRequest) {
     const giftWrapFee = isGift ? 99 : 0;
     const grandTotal = Math.max(0, subtotal - discount + shippingFee + giftWrapFee);
 
-    // 4. Anti-RTO Cash on Delivery Deposit logic
-    // 4. Tentative Pricing & Token Booking Deposit Policy
-    // Standard ₹199 token deposit per custom piece to initiate WhatsApp discussion
-    const tokenBookingAmount = verifiedOrderItems.reduce((acc: number, item: any) => {
-      if (item.isCustomizable) {
-        return acc + 199 * (item.quantity || 1);
-      }
-      return acc + (item.unitPrice || 0) * (item.quantity || 1);
-    }, 0);
-
-    let isTokenDeposit = true;
-    let payableAmountPaise = Math.round(tokenBookingAmount * 100);
-    let remainingTentativeBalance = Math.max(0, grandTotal - tokenBookingAmount);
-
-    if (paymentMethod === "FULL_TENTATIVE_UPI") {
-      isTokenDeposit = false;
-      payableAmountPaise = Math.round(grandTotal * 100);
-      remainingTentativeBalance = 0;
-    }
-
+    // 4. Offline Payment & Settlement Policy
+    // No online payment gateway is invoked. All payments are handled offline directly with the artisan
+    // (Cash on Delivery or Direct UPI upon design approval / delivery).
+    const isTokenDeposit = false;
+    const tokenBookingAmount = 0;
+    const remainingTentativeBalance = grandTotal;
     const refundPolicyNotes =
-      "50% of the token amount will be returned if final price or design is not agreed over WhatsApp.";
+      "Payment will be settled offline directly with the artisan (Cash on Delivery or Direct UPI upon design approval / delivery).";
 
     // 5. Generate Cryptographically Secure Unpredictable Order Number
     const year = new Date().getFullYear();
     const randomSuffix = crypto.randomBytes(3).toString("hex").toUpperCase();
     const orderNumber = `ART-${year}-${randomSuffix}`;
 
-    // 6. Create Razorpay Order
-    const razorpayOrder = await createRazorpayOrder({
-      amountPaise: payableAmountPaise,
-      receipt: orderNumber,
-      notes: {
-        orderNumber,
-        customerPhone: cleanPhone,
-        isCustomized: verifiedOrderItems.some((it: any) => it.isCustomizable) ? "true" : "false",
-        paymentMethod,
-        isTokenDeposit: isTokenDeposit ? "true" : "false",
-        tokenAmountPaid: String(isTokenDeposit ? tokenBookingAmount : grandTotal),
-        remainingTentativeBalance: String(remainingTentativeBalance),
-        ...(cleanGiftMessage ? { giftMessage: cleanGiftMessage } : {}),
-      },
-    });
-
-    // 7. Persist order to local disk repository
+    // 6. Persist order directly to disk/database repository with OFFLINE_SETTLEMENT status
     try {
       orderRepository.saveOrder({
         orderNumber,
@@ -213,8 +182,8 @@ export async function POST(req: NextRequest) {
         shippingFee,
         giftWrapFee,
         isTokenDeposit,
-        tokenAmountPaid: isTokenDeposit ? tokenBookingAmount : grandTotal,
-        remainingTentativeBalance,
+        tokenAmountPaid: 0,
+        remainingTentativeBalance: grandTotal,
         refundPolicyNotes,
         shippingAddress: {
           fullName: shippingAddress.fullName,
@@ -228,7 +197,12 @@ export async function POST(req: NextRequest) {
         neededByDate: neededByDate || null,
         neededByReason: neededByReason || null,
         status: "ORDER_CONFIRMED",
+        statusLabel: "Stage 1: Laser Cutting & Timber Prep",
         stageIndex: 1,
+        paymentDetails: {
+          method: "OFFLINE_SETTLEMENT",
+          status: "PENDING_OFFLINE",
+        },
       });
     } catch (saveErr) {
       console.error("[create-order] Order repository save warning:", saveErr);
@@ -237,19 +211,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       orderNumber,
-      razorpayOrderId: razorpayOrder.id,
-      amountPaise: payableAmountPaise,
+      paymentMethod: "OFFLINE_SETTLEMENT",
+      paymentStatus: "PENDING_OFFLINE",
       grandTotal,
       subtotal,
       discount,
       shippingFee,
       giftWrapFee,
-      isTokenDeposit,
-      tokenBookingAmount,
-      remainingTentativeBalance,
-      refundPolicyNotes,
       currency: "INR",
-      isMockMode: process.env.MOCK_MODE === "true",
+      message: "Order placed successfully. Payment will be handled offline directly with the artisan.",
     });
   } catch (error: any) {
     console.error("Order creation error:", error);

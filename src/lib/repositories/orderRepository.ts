@@ -65,10 +65,12 @@ export interface OrderRecord {
     trackingUrl: string;
   };
   paymentDetails?: {
+    method?: string;
+    status?: "PENDING" | "PAID" | "REFUNDED" | "PENDING_OFFLINE" | "SETTLED_OFFLINE";
     razorpayOrderId?: string;
     razorpayPaymentId?: string;
-    status: "PENDING" | "PAID" | "REFUNDED";
     paidAt?: string;
+    offlineNotes?: string;
   };
   items: OrderItemRecord[];
 }
@@ -178,10 +180,10 @@ export const orderRepository = {
       discount: orderData.discount,
       shippingFee: orderData.shippingFee,
       giftWrapFee: orderData.giftWrapFee,
-      isTokenDeposit: orderData.isTokenDeposit ?? true,
-      tokenAmountPaid: orderData.tokenAmountPaid,
-      remainingTentativeBalance: orderData.remainingTentativeBalance,
-      refundPolicyNotes: orderData.refundPolicyNotes,
+      isTokenDeposit: orderData.isTokenDeposit ?? false,
+      tokenAmountPaid: orderData.tokenAmountPaid ?? 0,
+      remainingTentativeBalance: orderData.remainingTentativeBalance ?? orderData.grandTotal ?? 0,
+      refundPolicyNotes: orderData.refundPolicyNotes || "Payment handled offline directly with the artisan (Cash / Direct UPI on Delivery).",
       invoiceId: orderData.invoiceId || `INV-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}`,
       neededByDate: orderData.neededByDate || null,
       neededByReason: orderData.neededByReason || null,

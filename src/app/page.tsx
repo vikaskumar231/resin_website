@@ -246,7 +246,7 @@ export default function HomePage() {
                             ₹{prod.basePrice.toLocaleString("en-IN")}
                           </span>
                           <span className="block text-[9px] text-emerald-800 font-semibold">
-                            Pay ₹199 Token Deposit
+                            Pay Offline
                           </span>
                         </div>
 
@@ -413,9 +413,9 @@ export default function HomePage() {
                 <div className="w-12 h-12 rounded-2xl bg-brand-sand flex items-center justify-center text-brand-emerald font-serif font-bold text-xl">
                   1
                 </div>
-                <h3 className="font-serif text-xl font-bold text-brand-emerald">1. Choose Piece &amp; Pay Token Deposit</h3>
+                <h3 className="font-serif text-xl font-bold text-brand-emerald">1. Choose Piece &amp; Order (Pay Offline)</h3>
                 <p className="text-xs text-brand-charcoal/70 leading-relaxed">
-                  Browse our handcrafted creations, enter your custom ideas or notes, and pay a <strong>₹199 token deposit</strong> to secure your spot in our workshop queue and initiate direct consultation.
+                  Browse our handcrafted creations, enter your custom ideas or notes, and place your order with <strong>zero upfront online payment</strong> to secure your spot in our workshop queue.
                 </p>
               </div>
 
@@ -425,7 +425,7 @@ export default function HomePage() {
                 </div>
                 <h3 className="font-serif text-xl font-bold text-brand-emerald">2. Agree Delivery Date &amp; Price on WhatsApp</h3>
                 <p className="text-xs text-brand-charcoal/70 leading-relaxed">
-                  All website prices are tentative. Our artist connects with you on WhatsApp to review custom options, send physical layout photos, agree upon the final price, and confirm your delivery date. (<strong>50% refund guarantee</strong> if not agreed).
+                  All website prices are tentative. Our artist connects with you on WhatsApp to review custom options, send layout photos, agree upon the final price, and confirm your delivery date. (Settle payment offline via Direct UPI or Cash).
                 </p>
               </div>
 

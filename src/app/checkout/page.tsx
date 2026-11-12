@@ -57,15 +57,13 @@ export default function CheckoutPage() {
     pincode: "",
   });
 
-  const [paymentMethod, setPaymentMethod] = useState<"TOKEN_UPI" | "FULL_TENTATIVE_UPI">("TOKEN_UPI");
+  const [paymentMethod, setPaymentMethod] = useState<string>("OFFLINE_SETTLEMENT");
 
   const subtotal = cart.getSubtotal();
   const discount = cart.getDiscountAmount();
   const shippingFee = cart.getShippingFee();
   const giftWrapFee = cart.isGift ? 99 : 0;
   const grandTotal = cart.getGrandTotal();
-  const tokenBookingAmount = cart.getTokenBookingAmount();
-  const remainingTentativeBalance = cart.getRemainingTentativeBalance();
 
   // Handle Indian PIN code auto-fill mock
   const handlePincodeChange = (pincode: string) => {
@@ -86,7 +84,7 @@ export default function CheckoutPage() {
     setErrorMessage(null);
 
     try {
-      // 1. Call server API to create order & get Razorpay order ID
+      // Direct single-step order registration for offline payment
       const res = await fetch("/api/checkout/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -103,7 +101,7 @@ export default function CheckoutPage() {
             ? { fullName: contact.fullName, phone: contact.phone, ...shipping }
             : billing,
           isBillingSameAsShipping: isBillingSame,
-          paymentMethod,
+          paymentMethod: "OFFLINE_SETTLEMENT",
           isGift: cart.isGift,
           giftMessage: cart.giftMessage,
           couponCode: cart.appliedCoupon?.code,
@@ -117,26 +115,7 @@ export default function CheckoutPage() {
         throw new Error(orderData.error || "Failed to initialize order");
       }
 
-      // 2. Dual-Mode Mock Execution (Simulate UPI Success)
-      // When live Razorpay SDK is loaded in browser, window.Razorpay opens checkout modal
-      // In development / sandbox mode, we verify the order directly:
-      const verifyRes = await fetch("/api/checkout/verify-payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          orderNumber: orderData.orderNumber,
-          razorpayOrderId: orderData.razorpayOrderId,
-          razorpayPaymentId: `pay_mock_${Date.now()}`,
-          razorpaySignature: "mock_signature_valid",
-        }),
-      });
-
-      const verifyData = await verifyRes.json();
-      if (!verifyRes.ok) {
-        throw new Error(verifyData.error || "Payment verification failed");
-      }
-
-      // Clear cart on successful order
+      // Order created successfully with offline payment. Clear cart and proceed to confirmation!
       cart.clearCart();
       router.push(`/order-confirmation/${orderData.orderNumber}`);
     } catch (err: any) {
@@ -211,7 +190,7 @@ export default function CheckoutPage() {
                 : "bg-white text-slate-500 border-brand-sand"
               }`}
           >
-            3. Token Deposit
+            3. Offline Settlement
           </div>
         </div>
 
@@ -521,98 +500,74 @@ export default function CheckoutPage() {
                     onClick={() => setStep(3)}
                     className="px-8 py-3 rounded-full bg-brand-emerald text-white font-bold text-sm hover:bg-brand-teal transition-all"
                   >
-                    Continue to Payment ➔
+                    Review Order &amp; Offline Payment ➔
                   </button>
                 </div>
               </div>
             )}
 
-            {/* STEP 3: PAYMENT METHOD */}
+            {/* STEP 3: ORDER REVIEW & OFFLINE PAYMENT */}
             {step === 3 && (
               <div className="space-y-6">
                 <div>
                   <h3 className="font-serif text-xl font-bold text-brand-emerald">
-                    Payment: Token Booking Deposit
+                    3. Order Review &amp; Offline Payment
                   </h3>
                   <p className="text-xs text-brand-charcoal/60 mt-1">
-                    All prices are tentative estimates. Pay only a token amount today to initiate your direct 1-on-1 WhatsApp consultation with the artist.
+                    No online payment required today. Your order is registered directly into our workshop queue. Payment will be settled offline directly with the artisan.
                   </p>
                 </div>
 
-                {/* 50% Token Refund Guarantee Card */}
-                <div className="p-4 rounded-2xl bg-amber-50/90 border border-brand-gold/50 space-y-2">
-                  <div className="flex items-center gap-2 text-xs font-bold text-amber-950">
-                    <ShieldCheck className="w-4 h-4 text-brand-gold shrink-0" />
-                    <span>Tentative Pricing &amp; 50% Token Refund Guarantee</span>
+                {/* Zero Online Payment Reassurance Banner */}
+                <div className="p-5 rounded-2xl bg-emerald-50/90 border border-emerald-300 space-y-3">
+                  <div className="flex items-center gap-2 text-xs font-bold text-emerald-950">
+                    <ShieldCheck className="w-5 h-5 text-emerald-700 shrink-0" />
+                    <span>Zero Online Risk • 100% Offline Settlement</span>
                   </div>
-                  <p className="text-[11px] text-amber-900 leading-relaxed">
-                    All prices on Artआलय are tentative estimates. The final price is finalized only after your requirements are discussed and digital layout proofs are approved over WhatsApp with our artist.
+                  <p className="text-[12px] text-emerald-900 leading-relaxed">
+                    We do not collect card numbers, CVVs, or online UPI payments. Your order is recorded immediately, and our artisan connects with you 1-on-1 on WhatsApp to confirm design layout proofs and specifications.
                   </p>
-                  <div className="p-2.5 rounded-xl bg-white/90 border border-amber-200 text-[11px] font-bold text-emerald-900 flex items-center gap-2">
-                    <span className="text-sm">🛡️</span>
-                    <span>In case the final price or design is not agreed later, 50% of the token amount will be returned to you.</span>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  {/* Option 1: Token Booking Deposit (Standard) */}
-                  <div
-                    onClick={() => setPaymentMethod("TOKEN_UPI")}
-                    className={`p-5 rounded-2xl border cursor-pointer transition-all ${paymentMethod === "TOKEN_UPI"
-                        ? "border-brand-emerald bg-brand-emerald/5 ring-2 ring-brand-emerald/30 shadow-md"
-                        : "border-brand-sand bg-white hover:border-slate-300"
-                      }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Smartphone className="w-5 h-5 text-brand-emerald" />
-                        <div>
-                          <p className="text-sm font-bold text-brand-charcoal">
-                            Pay Token Booking Deposit (₹{tokenBookingAmount.toLocaleString("en-IN")})
-                          </p>
-                          <p className="text-xs text-slate-500">
-                            Pay ₹{tokenBookingAmount} token deposit now via UPI (GPay, PhonePe, Paytm, Cards) to confirm interest &amp; start WhatsApp consultation.
-                          </p>
-                        </div>
-                      </div>
-                      <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 shrink-0">
-                        Recommended
-                      </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px] font-bold text-emerald-900">
+                    <div className="p-2.5 rounded-xl bg-white/90 border border-emerald-200 flex items-center gap-2">
+                      <span className="text-base">💵</span>
+                      <span>Cash on Delivery (COD)</span>
                     </div>
-                  </div>
-
-                  {/* Option 2: Full Tentative Prepayment */}
-                  <div
-                    onClick={() => setPaymentMethod("FULL_TENTATIVE_UPI")}
-                    className={`p-5 rounded-2xl border cursor-pointer transition-all ${paymentMethod === "FULL_TENTATIVE_UPI"
-                        ? "border-brand-gold bg-amber-50/70 ring-2 ring-brand-gold/30 shadow-md"
-                        : "border-brand-sand bg-white hover:border-slate-300"
-                      }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Truck className="w-5 h-5 text-brand-gold" />
-                        <div>
-                          <p className="text-sm font-bold text-brand-charcoal">
-                            Prepay Full Tentative Estimate (₹{grandTotal.toLocaleString("en-IN")})
-                          </p>
-                          <p className="text-xs text-slate-500">
-                            Pay full tentative amount upfront via UPI. Any price adjustments are finalized and settled after WhatsApp approval.
-                          </p>
-                        </div>
-                      </div>
-                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 shrink-0">
-                        Full Prepay
-                      </span>
+                    <div className="p-2.5 rounded-xl bg-white/90 border border-emerald-200 flex items-center gap-2">
+                      <span className="text-base">📱</span>
+                      <span>Direct UPI (GPay / PhonePe / Paytm)</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-brand-sand/50 border border-brand-sand text-xs text-slate-600 flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-brand-teal shrink-0" />
-                  <span>
-                    Artआलय Dual-Mode Mock Simulator active: Clicking &quot;Pay Token Deposit&quot; instantly processes test payment and opens order tracking.
-                  </span>
+                {/* Selected Offline Payment Method Card */}
+                <div className="p-5 rounded-2xl border-2 border-brand-emerald bg-brand-emerald/5 ring-2 ring-brand-emerald/20 shadow-xs space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Truck className="w-5 h-5 text-brand-emerald" />
+                      <div>
+                        <p className="text-sm font-bold text-brand-charcoal">
+                          Offline Payment (Direct to Artisan)
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          Settle upon WhatsApp design proof approval or when your package arrives.
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 shrink-0">
+                      Offline Mode
+                    </span>
+                  </div>
+
+                  <div className="text-[11px] text-slate-600 bg-white/80 p-3 rounded-xl border border-brand-sand/80 space-y-1">
+                    <div className="flex justify-between">
+                      <span>Delivery Contact:</span>
+                      <strong className="text-brand-charcoal">{contact.fullName} ({contact.phone})</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Delivery Destination:</span>
+                      <span className="text-brand-charcoal text-right truncate max-w-[220px]">{shipping.city}, {shipping.state} - {shipping.pincode}</span>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="pt-4 flex items-center justify-between">
@@ -625,18 +580,14 @@ export default function CheckoutPage() {
                   <button
                     onClick={handlePlaceOrder}
                     disabled={isSubmitting}
-                    className="px-8 py-4 rounded-full bg-brand-emerald hover:bg-brand-teal text-brand-sand font-bold text-sm tracking-wide shadow-lg transition-all flex items-center gap-2"
+                    className="px-8 py-4 rounded-full bg-brand-emerald hover:bg-brand-teal text-brand-sand font-bold text-sm tracking-wide shadow-lg transition-all flex items-center gap-2 active:scale-95"
                   >
                     {isSubmitting ? (
-                      <span>Authorizing Payment...</span>
+                      <span>Registering Order in Workshop...</span>
                     ) : (
                       <>
                         <Sparkles className="w-4 h-4 text-brand-gold" />
-                        <span>
-                          {paymentMethod === "TOKEN_UPI"
-                            ? `Pay ₹${tokenBookingAmount.toLocaleString("en-IN")} Token Deposit & Start WhatsApp Consultation ➔`
-                            : `Pay ₹${grandTotal.toLocaleString("en-IN")} via UPI ➔`}
-                        </span>
+                        <span>Confirm Order (Pay Offline) &amp; Open WhatsApp ➔</span>
                       </>
                     )}
                   </button>
@@ -695,28 +646,26 @@ export default function CheckoutPage() {
                 </div>
               )}
               <div className="flex justify-between text-xs text-slate-600 pt-1">
-                <span>Tentative Total Order Value</span>
+                <span>Estimated Total Value</span>
                 <span className="font-bold">₹{grandTotal.toLocaleString("en-IN")}</span>
               </div>
               <div className="flex justify-between text-xs text-slate-600">
-                <span>Remaining Tentative Balance (Due after WhatsApp approval)</span>
-                <span>₹{remainingTentativeBalance.toLocaleString("en-IN")}</span>
+                <span>Payment Mode</span>
+                <span className="font-semibold text-emerald-800">Offline Settlement</span>
               </div>
 
-              {/* Token Payable Today Box */}
+              {/* Offline Settlement Total Box */}
               <div className="flex justify-between items-center text-sm font-bold text-brand-emerald pt-2.5 border-t border-brand-sand bg-emerald-50/70 p-3 rounded-2xl border border-emerald-200">
                 <div>
                   <span className="block text-brand-emerald font-extrabold">
-                    {paymentMethod === "TOKEN_UPI" ? "Token Deposit Payable Today" : "Full Amount Payable Today"}
+                    Payable Offline
                   </span>
                   <span className="text-[10px] text-emerald-700 font-normal">
-                    {paymentMethod === "TOKEN_UPI"
-                      ? "Initiates 1-on-1 artist WhatsApp consultation"
-                      : "Fully refundable or adjustable upon approval"}
+                    Cash on Delivery or Direct UPI on WhatsApp proof approval
                   </span>
                 </div>
                 <span className="text-xl font-black text-brand-emerald">
-                  ₹{(paymentMethod === "TOKEN_UPI" ? tokenBookingAmount : grandTotal).toLocaleString("en-IN")}
+                  ₹{grandTotal.toLocaleString("en-IN")}
                 </span>
               </div>
 
@@ -729,13 +678,13 @@ export default function CheckoutPage() {
             <div className="p-4 rounded-2xl bg-brand-ivory border border-brand-sand space-y-2 text-xs text-brand-charcoal/70">
               <div className="flex items-center gap-2 font-bold text-brand-emerald">
                 <ShieldCheck className="w-4 h-4 text-brand-teal" />
-                <span>The Artआलय WhatsApp Consultation Guarantee</span>
+                <span>The Artआलय Offline Peace-of-Mind Guarantee</span>
               </div>
               <p className="text-[11px] leading-relaxed">
-                Before pouring resin, our artisan discusses your exact requirements and sends high-resolution proofs directly to WhatsApp.
+                Before pouring resin, our artisan discusses your exact requirements and sends high-resolution layout proofs directly on WhatsApp.
               </p>
               <div className="pt-1.5 border-t border-brand-sand/70 text-[11px] font-bold text-emerald-800">
-                🛡️ In case the final price or design is not agreed, 50% of the token amount is returned.
+                🛡️ No upfront payment required. Settle directly with the artisan upon design agreement or on delivery.
               </div>
             </div>
           </div>

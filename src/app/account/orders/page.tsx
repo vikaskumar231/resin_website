@@ -400,7 +400,7 @@ export default function CustomerOrdersPage() {
                     <span>Delivery date &amp; final price are agreed 1-on-1 over WhatsApp with our artist.</span>
                   </div>
                   <span className="text-[11px] font-bold text-emerald-800 bg-white px-2.5 py-0.5 rounded-full border border-brand-sand shadow-2xs">
-                    50% Token Refund Guarantee
+                    Offline Settlement (Pay on Delivery / WhatsApp)
                   </span>
                 </div>
 

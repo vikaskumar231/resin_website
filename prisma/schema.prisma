@@ -54,6 +54,7 @@ enum PaymentStatus {
 }
 
 enum PaymentMethod {
+  OFFLINE_SETTLEMENT
   RAZORPAY_UPI
   RAZORPAY_CARD
   RAZORPAY_NETBANKING
@@ -277,7 +278,7 @@ model Order {
   customerEmail            String?
   status                   OrderStatus          @default(ORDER_CONFIRMED)
   paymentStatus            PaymentStatus        @default(PENDING)
-  paymentMethod            PaymentMethod        @default(RAZORPAY_UPI)
+  paymentMethod            PaymentMethod        @default(OFFLINE_SETTLEMENT)
   subtotal                 Decimal              @db.Decimal(10, 2)
   discount                 Decimal              @default(0.00) @db.Decimal(10, 2)
   couponId                 String?

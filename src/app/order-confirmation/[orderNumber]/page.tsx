@@ -45,13 +45,13 @@ export default function OrderConfirmationPage({ params }: OrderConfirmationPageP
             </div>
             <div className="text-xs text-brand-charcoal/80 leading-relaxed space-y-2">
               <p>
-                1. <strong>Token Booking Confirmed:</strong> You have paid a <strong>₹199 token deposit</strong> to initiate personalized 1-on-1 discussion with our artisan.
+                1. <strong>Order Confirmed (Zero Upfront Payment):</strong> Your handcrafted piece is officially registered in our workshop queue. No online payment was deducted.
               </p>
               <p>
-                2. <strong>Delivery Date &amp; Price Agreed on WhatsApp:</strong> All website prices are tentative. Our artist connects with you over WhatsApp to discuss custom notes, inspect layout proofs, agree upon the final price, and mutually confirm the actual delivery schedule.
+                2. <strong>Design &amp; Delivery Finalized on WhatsApp:</strong> All website prices are tentative estimates. Our artist connects with you directly over WhatsApp to review custom options, send layout photos, agree upon the final price, and mutually confirm the delivery schedule.
               </p>
               <p>
-                3. <strong>50% Token Refund Guarantee:</strong> If the final price or design is not agreed during your WhatsApp discussion, <strong>50% of your token deposit is refunded immediately</strong>.
+                3. <strong>100% Offline Settlement:</strong> Payment will be settled offline directly with the artisan via Direct UPI (GPay, PhonePe, Paytm) or Cash upon proof approval or at delivery.
               </p>
             </div>
 

@@ -1,48 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyRazorpaySignature } from "@/lib/payments/razorpay";
 import { orderRepository } from "@/lib/repositories/orderRepository";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const {
-      orderNumber,
-      razorpayOrderId,
-      razorpayPaymentId,
-      razorpaySignature,
-    } = body;
+    const { orderNumber } = body;
 
-    if (!orderNumber || !razorpayOrderId || !razorpayPaymentId || !razorpaySignature) {
+    if (!orderNumber) {
       return NextResponse.json(
-        { error: "Missing required payment verification tokens (orderNumber, razorpayOrderId, razorpayPaymentId, razorpaySignature)" },
+        { error: "Missing required orderNumber" },
         { status: 400 }
       );
     }
 
-    // Cryptographic signature verification
-    const isValid = verifyRazorpaySignature({
-      orderId: razorpayOrderId,
-      paymentId: razorpayPaymentId,
-      signature: razorpaySignature,
-    });
-
-    if (!isValid) {
-      return NextResponse.json(
-        { error: "Payment signature verification failed. Possible payload tampering." },
-        { status: 400 }
-      );
-    }
-
-    // Link verified payment to order record for audit & accounting
+    // With offline payment, orders are confirmed directly upon creation.
+    // This route guarantees backward compatibility for any pending client callbacks.
     try {
       orderRepository.saveOrder({
         orderNumber,
         status: "ORDER_CONFIRMED",
         paymentDetails: {
-          razorpayOrderId,
-          razorpayPaymentId,
-          status: "PAID",
-          paidAt: new Date().toISOString(),
+          method: "OFFLINE_SETTLEMENT",
+          status: "PENDING_OFFLINE",
+          offlineNotes: "Order registered for offline settlement (Cash / Direct UPI on Delivery or WhatsApp).",
         },
       });
     } catch (saveErr) {
@@ -51,14 +31,14 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Payment successfully verified and order confirmed.",
+      message: "Order confirmed for offline settlement.",
       orderNumber,
       redirectUrl: `/order-confirmation/${orderNumber}`,
     });
   } catch (error: any) {
-    console.error("Payment verification error:", error);
+    console.error("Offline payment confirmation error:", error);
     return NextResponse.json(
-      { error: "Payment verification failed. Please contact customer support if money was debited." },
+      { error: "Failed to confirm order for offline settlement." },
       { status: 500 }
     );
   }

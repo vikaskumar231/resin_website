@@ -79,6 +79,7 @@ END $$;
 
 DO $$ BEGIN
     CREATE TYPE payment_method AS ENUM (
+        'OFFLINE_SETTLEMENT',
         'RAZORPAY_UPI',
         'RAZORPAY_CARD',
         'RAZORPAY_NETBANKING',
@@ -323,7 +324,7 @@ CREATE TABLE IF NOT EXISTS orders (
     customer_email VARCHAR(255),
     status order_status NOT NULL DEFAULT 'ORDER_CONFIRMED',
     payment_status payment_status NOT NULL DEFAULT 'PENDING',
-    payment_method payment_method NOT NULL DEFAULT 'RAZORPAY_UPI',
+    payment_method payment_method NOT NULL DEFAULT 'OFFLINE_SETTLEMENT',
     
     -- Financial Breakdowns
     subtotal NUMERIC(10, 2) NOT NULL CHECK (subtotal >= 0),

@@ -108,8 +108,8 @@ export default function OrderTrackingPage({ params }: TrackPageProps) {
               </div>
             </div>
 
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-950 border border-amber-300">
-              ₹199 Token Paid
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-950 border border-emerald-300">
+              Offline Settlement
             </span>
           </div>
 
@@ -117,7 +117,7 @@ export default function OrderTrackingPage({ params }: TrackPageProps) {
             <div className="flex items-start gap-2.5">
               <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
               <p>
-                <strong>Tentative Pricing:</strong> All catalog prices are tentative estimates. You have paid a <strong>₹199 token deposit</strong> to secure your spot in our workshop queue and initiate personalized consultation.
+                <strong>Zero Upfront Payment:</strong> All catalog prices are tentative estimates. No online payment was deducted. Your piece is queued for studio handcrafting.
               </p>
             </div>
             <div className="flex items-start gap-2.5">
@@ -129,7 +129,7 @@ export default function OrderTrackingPage({ params }: TrackPageProps) {
             <div className="flex items-start gap-2.5">
               <ShieldCheck className="w-4 h-4 text-brand-gold shrink-0 mt-0.5" />
               <p>
-                <strong>50% Token Refund Guarantee:</strong> In case the design proof or final price is not mutually agreed during your WhatsApp discussion, <strong>50% of your token amount is promptly returned</strong>.
+                <strong>Offline Settlement Guarantee:</strong> Payment is settled offline directly with the artisan via Direct UPI (GPay/PhonePe/Paytm) or Cash on Delivery upon proof approval or delivery.
               </p>
             </div>
           </div>

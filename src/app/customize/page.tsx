@@ -195,7 +195,7 @@ export default function CustomizeIndexPage() {
                             ₹{prod.basePrice.toLocaleString("en-IN")}
                           </span>
                           <span className="text-[10px] text-emerald-800 font-semibold">
-                            Pay ₹199 Token Deposit
+                            Pay Offline
                           </span>
                         </div>
                       </div>
@@ -235,9 +235,9 @@ export default function CustomizeIndexPage() {
             </div>
             <div className="p-4 bg-white/70 rounded-2xl border border-brand-sand/60">
               <span className="text-2xl block mb-2">🛡️</span>
-              <h4 className="text-xs font-bold text-brand-emerald">50% Token Refund Guarantee</h4>
+              <h4 className="text-xs font-bold text-brand-emerald">Zero Online Risk</h4>
               <p className="text-[11px] text-brand-charcoal/70 mt-1">
-                Pay only ₹199 token deposit today. If final price or design is not agreed on WhatsApp, 50% is returned promptly.
+                Zero upfront payment required. Settle offline via Direct UPI or Cash upon design agreement or arrival.
               </p>
             </div>
           </div>
