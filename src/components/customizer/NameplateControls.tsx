@@ -4,6 +4,8 @@ import React, { useState, useRef } from "react";
 import { useCustomizerStore } from "@/store/useCustomizerStore";
 import { useCartStore } from "@/store/useCartStore";
 import { sanitizeLaserText } from "@/lib/sanitizer";
+import { compressImageToDataUrl } from "@/lib/imageCompressor";
+import { getArtistWhatsAppLink } from "@/lib/whatsapp/config";
 import {
   Sparkles,
   Type,
@@ -27,6 +29,7 @@ export default function NameplateControls() {
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [textError, setTextError] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isOptimizingImage, setIsOptimizingImage] = useState(false);
 
   const handleAddToCart = () => {
     cart.addItem({
@@ -86,28 +89,33 @@ export default function NameplateControls() {
     }
   };
 
-  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      setUploadError("Please upload a valid image file (PNG, JPG, WEBP)");
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      setUploadError("Image size must be under 5MB");
+      setUploadError("Please select a valid image file (PNG, JPG, WEBP)");
       return;
     }
 
     setUploadError(null);
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        store.setReferenceImage(reader.result);
-      }
-    };
-    reader.readAsDataURL(file);
+    setIsOptimizingImage(true);
+    try {
+      // Auto-compress image to 5 MB without requiring user validation
+      const dataUrl = await compressImageToDataUrl(file, 5 * 1024 * 1024);
+      store.setReferenceImage(dataUrl);
+    } catch (err) {
+      console.error("Reference photo optimization failed:", err);
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === "string") {
+          store.setReferenceImage(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    } finally {
+      setIsOptimizingImage(false);
+    }
   };
 
   const handleRemoveImage = () => {
@@ -361,7 +369,17 @@ export default function NameplateControls() {
             </div>
           )}
 
-          {!store.nameplate.referenceImage ? (
+          {isOptimizingImage ? (
+            <div className="p-5 border-2 border-dashed border-brand-gold rounded-2xl bg-amber-500/10 text-center flex flex-col items-center justify-center gap-2">
+              <Sparkles className="w-6 h-6 text-brand-gold animate-spin" />
+              <p className="text-xs font-bold text-brand-emerald">
+                Optimizing photo to high-resolution 5MB...
+              </p>
+              <p className="text-[11px] text-slate-500">
+                Preserving retina quality and color fidelity for the artisan.
+              </p>
+            </div>
+          ) : !store.nameplate.referenceImage ? (
             <div
               onClick={() => fileInputRef.current?.click()}
               className="p-5 border-2 border-dashed border-brand-sand hover:border-brand-gold rounded-2xl bg-white/70 hover:bg-white text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2 group"
@@ -374,7 +392,7 @@ export default function NameplateControls() {
                   Click to upload sample image or entrance photo
                 </p>
                 <p className="text-[11px] text-slate-500 mt-0.5">
-                  Upload an inspiration image, door photo, or color reference (PNG, JPG up to 5MB)
+                  Upload an inspiration image, door photo, or color reference (Photos auto-optimized to 5MB)
                 </p>
               </div>
             </div>
@@ -432,7 +450,7 @@ export default function NameplateControls() {
             </div>
 
             <a
-              href="https://wa.me/919876543210?text=Hello%20ArtAalay!%20I'm%20customizing%20a%20Bespoke%20Resin%20Nameplate%20and%20would%20like%20to%20discuss%20design%20details."
+              href={getArtistWhatsAppLink("Hello ArtAalay! I'm customizing a Bespoke Resin Nameplate and would like to discuss design details.")}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold tracking-wide shadow-xs shrink-0 transition-all"

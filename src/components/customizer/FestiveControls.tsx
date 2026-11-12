@@ -3,6 +3,8 @@
 import React, { useState, useRef } from "react";
 import { useCustomizerStore } from "@/store/useCustomizerStore";
 import { useCartStore } from "@/store/useCartStore";
+import { compressImageToDataUrl } from "@/lib/imageCompressor";
+import { getArtistWhatsAppLink } from "@/lib/whatsapp/config";
 import {
   Sparkles,
   Check,
@@ -24,6 +26,7 @@ export default function FestiveControls() {
 
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isOptimizingImage, setIsOptimizingImage] = useState(false);
 
   const handleAddToCart = () => {
     const requirements = store.festive?.requirementsText?.trim() || "";
@@ -55,28 +58,33 @@ export default function FestiveControls() {
     setTimeout(() => setShowSuccessToast(false), 3500);
   };
 
-  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      setUploadError("Please upload a valid image file (PNG, JPG, WEBP)");
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      setUploadError("Image size must be under 5MB");
+      setUploadError("Please select a valid image file (PNG, JPG, WEBP)");
       return;
     }
 
     setUploadError(null);
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        store.setFestiveReferenceImage(reader.result);
-      }
-    };
-    reader.readAsDataURL(file);
+    setIsOptimizingImage(true);
+    try {
+      // Auto-compress image to 5 MB without requiring user validation
+      const dataUrl = await compressImageToDataUrl(file, 5 * 1024 * 1024);
+      store.setFestiveReferenceImage(dataUrl);
+    } catch (err) {
+      console.error("Reference photo optimization failed:", err);
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === "string") {
+          store.setFestiveReferenceImage(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    } finally {
+      setIsOptimizingImage(false);
+    }
   };
 
   const handleRemoveImage = () => {
@@ -163,7 +171,17 @@ export default function FestiveControls() {
             </div>
           )}
 
-          {!store.festive?.referenceImage ? (
+          {isOptimizingImage ? (
+            <div className="p-6 border-2 border-dashed border-brand-gold rounded-2xl bg-amber-500/10 text-center flex flex-col items-center justify-center gap-2 shadow-2xs">
+              <Sparkles className="w-6 h-6 text-brand-gold animate-spin" />
+              <p className="text-xs font-bold text-brand-emerald">
+                Optimizing photo to high-resolution 5MB...
+              </p>
+              <p className="text-[10px] text-slate-500">
+                Preserving sacred details and geode luster for the artisan.
+              </p>
+            </div>
+          ) : !store.festive?.referenceImage ? (
             <div
               onClick={() => fileInputRef.current?.click()}
               className="p-6 border-2 border-dashed border-brand-sand hover:border-brand-gold rounded-2xl bg-white/70 hover:bg-white text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2 group shadow-2xs"
@@ -176,7 +194,7 @@ export default function FestiveControls() {
                   Click to upload entrance picture, mandir photo, or sample design
                 </p>
                 <p className="text-[10px] text-slate-500 mt-0.5">
-                  PNG, JPG, WEBP up to 5MB • Optional
+                  Photos auto-optimized to 5MB • Optional
                 </p>
               </div>
             </div>
@@ -243,7 +261,7 @@ export default function FestiveControls() {
             </div>
 
             <a
-              href="https://wa.me/919876543210?text=Hello%20ArtAalay!%20I%20have%20questions%20about%20customizing%20a%20Sacred%20Toran%20or%20Shubh%20Labh%20set."
+              href={getArtistWhatsAppLink("Hello ArtAalay! I have questions about customizing a Sacred Toran or Shubh Labh set.")}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 font-bold text-emerald-800 hover:text-emerald-950 underline underline-offset-2"

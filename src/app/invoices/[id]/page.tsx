@@ -28,7 +28,7 @@ export default function OrderReceiptPage({ params }: InvoicePageProps) {
       brandName: "Artआलय Artisanal Works",
       address: "Survey No. 42, Artisan Studio Park, Baner, Pune, Maharashtra - 411045",
       email: "care@artaalay.com",
-      whatsapp: "+91 98765 43210",
+      whatsapp: "+91 93735 67492",
     },
     buyer: {
       name: isAuthorized ? "Priya Sharma" : "Priya S***** [Masked for Privacy]",

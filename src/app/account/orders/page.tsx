@@ -431,7 +431,7 @@ export default function CustomerOrdersPage() {
 
                   {/* Direct WhatsApp Consultation Link */}
                   <a
-                    href={`https://wa.me/919876543210?text=${encodeURIComponent(
+                    href={`https://wa.me/919373567492?text=${encodeURIComponent(
                       `Namaste Artआलय Studio! I am inquiring about my Order #${order.orderNumber} to discuss requirements, price, and delivery date.`
                     )}`}
                     target="_blank"

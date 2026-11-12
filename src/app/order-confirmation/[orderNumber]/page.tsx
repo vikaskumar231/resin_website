@@ -57,7 +57,7 @@ export default function OrderConfirmationPage({ params }: OrderConfirmationPageP
 
             <div className="pt-2">
               <a
-                href={`https://wa.me/919876543210?text=${encodeURIComponent(
+                href={`https://wa.me/919373567492?text=${encodeURIComponent(
                   `Namaste Artआलय Studio! I have just placed Order #${orderNumber}. I would like to discuss my requirements, agree on the final price, and confirm my delivery date.`
                 )}`}
                 target="_blank"

@@ -234,9 +234,9 @@ As a shopper on Artआलय, I want product-specific, interactive, responsive 2
   4. LED inclusion toggle (12V Warm LED Backlighting +₹799).
   5. Sample reference image upload for WhatsApp discussion.
 - **AC 1.1A.3 (Sample Image Upload & WhatsApp Bridge):**
-  - Customer can upload a sample/reference image (PNG, JPG, WEBP up to 5MB) via drag-and-drop or file picker using client-side `FileReader`.
+  - Customer can upload a sample/reference image (PNG, JPG, WEBP). Photos of any size are automatically client-side compressed to 5MB before upload without blocking user validation.
   - Live canvas renders a floating "Reference Photo Attached" badge with a thumbnail.
-  - A prominent WhatsApp consultation card displays direct chat link (`wa.me/919876543210`) reassuring the buyer that the lead artist will review reference images and share pour progress over WhatsApp.
+  - A prominent WhatsApp consultation card displays direct chat link (`wa.me/919373567492`) reassuring the buyer that the lead artist will review reference images and share pour progress over WhatsApp.
   - Uploaded reference data URL and requirements text persist into cart customization payload (`referenceImage`, `requirementsText`).
 - **AC 1.1A.4 (Dynamic Deterministic Pricing):** Price tallies base price (₹2,499) + size upgrade + LED addon with 1-tap checkout.
 
@@ -257,7 +257,7 @@ As a shopper on Artआलय, I want product-specific, interactive, responsive 2
 - **AC 1.1B.3 (Reference Image Upload & WhatsApp Bridge):**
   - Allows uploading a sample/reference image (e.g. calligraphy style, couple initials, pet photo, car key pairing).
   - Live canvas displays a floating "Reference Photo Attached" badge and customer requirements pill.
-  - Includes direct WhatsApp consultation callout (`wa.me/919876543210`) for custom styling discussion.
+  - Includes direct WhatsApp consultation callout (`wa.me/919373567492`) for custom styling discussion.
   - Reference image and requirements text persist in cart customization payload (`requirementsText`, `referenceImage`).
 - **AC 1.1B.4 (Tentative Pricing & Token Booking Deposit Policy):**
   - Displayed price is a tentative estimate (Base ₹399 tentative + ₹99 optional engraved tag).
@@ -282,7 +282,7 @@ As a shopper on Artआलय, I want product-specific, interactive, responsive 2
 - **AC 1.1C.3 (Reference Image Upload & WhatsApp Bridge):**
   - Customer can upload sample/reference image (e.g. specific dried flower variety, wedding palette, book spine dimensions).
   - Live canvas displays floating "Reference Photo Attached" badge and customer requirements indicator pill.
-  - WhatsApp consultation banner with direct chat link (`wa.me/919876543210`).
+  - WhatsApp consultation banner with direct chat link (`wa.me/919373567492`).
   - Reference image and requirements text persist in cart customization payload.
 - **AC 1.1C.4 (Pricing):** Base price is ₹499 (+₹49 if personalized name is added).
 

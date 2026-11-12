@@ -154,3 +154,31 @@ export async function compressImageToLimit(
   });
 }
 
+/**
+ * Compresses an uploaded image file down to maxBytes (default: 5 MB) without requiring any validation,
+ * returning the optimized image as a high-quality Data URL for instant customizer rendering & store persistence.
+ */
+export async function compressImageToDataUrl(
+  file: File,
+  maxBytes: number = 5 * 1024 * 1024
+): Promise<string> {
+  let fileToRead = file;
+  if (file.size > maxBytes) {
+    fileToRead = await compressImageToLimit(file, maxBytes);
+  }
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+      } else {
+        reject(new Error("Failed to convert image to Data URL"));
+      }
+    };
+    reader.onerror = () => reject(reader.error || new Error("Failed to read image file"));
+    reader.readAsDataURL(fileToRead);
+  });
+}
+
+
