@@ -69,8 +69,6 @@ async function main() {
       inventoryCount: 100,
       curingLeadDays: 5,
       dimensions: "16\" x 10\" (Customizable up to 18\" x 12\")",
-      hsnCode: "3926",
-      gstRate: 18.00,
       customizerConfig: {
         substrates: ["RAW_TEAKWOOD", "FROSTED_ACRYLIC", "MATTE_BLACK_ACRYLIC"],
         colorways: ["OCEAN_WAVE", "EMERALD_GEODE", "MIDNIGHT_GOLD", "RUBY_WINE"],
@@ -110,8 +108,6 @@ async function main() {
       inventoryCount: 250,
       curingLeadDays: 3,
       dimensions: "1.8\" x 1.5\"",
-      hsnCode: "3926",
-      gstRate: 18.00,
       customizerConfig: {
         letters: ["A", "B", "C", "D", "E", "M", "P", "R", "S", "V"],
         colorways: ["GOLD_FOIL_CLEAR", "BLUSH_ROSE_PETAL", "EMERALD_MINT"],
@@ -144,8 +140,6 @@ async function main() {
       inventoryCount: 150,
       curingLeadDays: 3,
       dimensions: "5.5\" x 1.2\"",
-      hsnCode: "3926",
-      gstRate: 18.00,
       customizerConfig: {
         tasselColors: ["GOLDEN_AMBER", "EMERALD_GREEN", "ROYAL_BURGUNDY"],
         hasNameEngraving: true,
@@ -178,8 +172,6 @@ async function main() {
       inventoryCount: 80,
       curingLeadDays: 4,
       dimensions: "Pair of 4.5\" diameter geode discs",
-      hsnCode: "3926",
-      gstRate: 18.00,
       images: {
         create: [
           {

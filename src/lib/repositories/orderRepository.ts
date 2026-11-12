@@ -4,12 +4,14 @@ import { atomicWriteJsonSync } from "@/lib/utils/atomicFileWrite";
 
 export interface OrderItemRecord {
   productId: string;
-  slug: string;
+  slug?: string;
+  productSlug?: string;
   title: string;
   quantity: number;
   unitPrice: number;
   imageUrl?: string;
   customizationDetails?: any;
+  userId?: string | null;
 }
 
 export interface OrderRecord {
@@ -132,8 +134,11 @@ export const orderRepository = {
     const cleanEmail = email ? email.trim().toLowerCase() : "";
 
     return orders.filter((o) => {
-      // 1. Direct userId match
-      if (userId && o.userId === userId) return true;
+      // 1. Direct userId match on order OR linked order item
+      if (userId) {
+        if (o.userId === userId) return true;
+        if (o.items && o.items.some((it) => it.userId === userId)) return true;
+      }
 
       // 2. Phone match (last 10 digits)
       if (cleanPhone && o.customerPhone) {
@@ -195,18 +200,50 @@ export const orderRepository = {
       },
       courier: orderData.courier,
       paymentDetails: orderData.paymentDetails,
-      items: orderData.items || [],
+      items: (orderData.items || []).map((item) => ({
+        ...item,
+        userId: item.userId !== undefined ? item.userId : (orderData.userId || null),
+      })),
     };
 
     const existingIndex = orders.findIndex((o) => o.orderNumber === orderNumber);
     if (existingIndex >= 0) {
-      orders[existingIndex] = { ...orders[existingIndex], ...newRecord };
+      const existing = orders[existingIndex];
+      const mergedUserId = orderData.userId !== undefined ? (orderData.userId || null) : existing.userId;
+      orders[existingIndex] = {
+        ...existing,
+        ...newRecord,
+        userId: mergedUserId,
+        items: orderData.items
+          ? orderData.items.map((item) => ({
+              ...item,
+              userId: item.userId !== undefined ? item.userId : (mergedUserId || null),
+            }))
+          : existing.items.map((item) => ({
+              ...item,
+              userId: item.userId !== undefined ? item.userId : (mergedUserId || null),
+            })),
+      };
     } else {
       orders.unshift(newRecord);
     }
 
     writeOrdersToDisk(orders);
     return newRecord;
+  },
+
+  getOrderItemsForUser(userId: string): OrderItemRecord[] {
+    if (!userId) return [];
+    const userOrders = this.getOrdersForUser({ userId });
+    const items: OrderItemRecord[] = [];
+    for (const order of userOrders) {
+      for (const item of order.items || []) {
+        if (item.userId === userId || (!item.userId && order.userId === userId)) {
+          items.push(item);
+        }
+      }
+    }
+    return items;
   },
 };
 

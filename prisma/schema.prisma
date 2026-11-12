@@ -111,6 +111,7 @@ model User {
   isActive            Boolean              @default(true)
   addresses           Address[]
   orders              Order[]
+  orderItems          OrderItem[]
   reviews             Review[]
   savedDesigns        SavedDesign[]
   passwordResetTokens PasswordResetToken[]
@@ -202,8 +203,6 @@ model Product {
   lowStockThreshold Int            @default(5)
   curingLeadDays    Int            @default(3)
   dimensions        String?
-  hsnCode           String         @default("3926")
-  gstRate           Decimal        @default(18.00) @db.Decimal(5, 2)
   isActive          Boolean        @default(true)
   customizerConfig  Json?
   images            ProductImage[]
@@ -284,8 +283,6 @@ model Order {
   couponId                 String?
   coupon                   Coupon?              @relation(fields: [couponId], references: [id], onDelete: SetNull)
   shippingFee              Decimal              @default(0.00) @db.Decimal(10, 2)
-  taxAmount                Decimal              @default(0.00) @db.Decimal(10, 2)
-  taxDetails               Json? // CGST, SGST, IGST breakdown
   grandTotal               Decimal              @db.Decimal(10, 2)
   isCodDeposit             Boolean              @default(false)
   codDepositAmount         Decimal?             @default(0.00) @db.Decimal(10, 2)
@@ -293,7 +290,6 @@ model Order {
   shippingAddress          Json
   billingAddress           Json?
   isBillingSameAsShipping  Boolean              @default(true)
-  b2bDetails               Json?
   isGift                   Boolean              @default(false)
   giftMessage              String?
   giftWrapFee              Decimal              @default(0.00) @db.Decimal(10, 2)
@@ -301,7 +297,6 @@ model Order {
   cancelledAt              DateTime?
   items                    OrderItem[]
   payments                 Payment[]
-  taxInvoice               TaxInvoice?
   shippingManifest         ShippingManifest?
   statusHistory            OrderStatusHistory[]
   transitBreakageClaims    TransitBreakageClaim[]
@@ -320,12 +315,12 @@ model OrderItem {
   id                   String           @id @default(uuid())
   orderId              String
   order                Order            @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  userId               String?
+  user                 User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
   productId            String
   product              Product          @relation(fields: [productId], references: [id], onDelete: Restrict)
   quantity             Int              @default(1)
   unitPrice            Decimal          @db.Decimal(10, 2)
-  hsnCode              String           @default("3926")
-  gstRate              Decimal          @default(18.00) @db.Decimal(5, 2)
   customizationDetails Json?
   previewImageUrl      String?
   proofStatus          ProofStatus      @default(NOT_REQUIRED)
@@ -336,6 +331,7 @@ model OrderItem {
   createdAt            DateTime         @default(now())
 
   @@index([orderId])
+  @@index([userId])
   @@index([productId])
   @@index([proofStatus])
 }
@@ -374,30 +370,6 @@ model Payment {
   @@index([orderId])
   @@index([razorpayOrderId])
   @@index([razorpayPaymentId])
-}
-
-model TaxInvoice {
-  id                      String   @id @default(uuid())
-  invoiceNumber           String   @unique
-  orderId                 String   @unique
-  order                   Order    @relation(fields: [orderId], references: [id], onDelete: Restrict)
-  sellerLegalName         String   @default("Artआलय Artisanal Works Private Limited")
-  sellerGstin             String
-  sellerStateCode         String   @default("27")
-  buyerLegalName          String
-  buyerGstin              String?
-  placeOfSupplyStateCode  String
-  isInterState            Boolean  @default(false)
-  taxableAmount           Decimal  @db.Decimal(10, 2)
-  cgstAmount              Decimal  @default(0.00) @db.Decimal(10, 2)
-  sgstAmount              Decimal  @default(0.00) @db.Decimal(10, 2)
-  igstAmount              Decimal  @default(0.00) @db.Decimal(10, 2)
-  totalTaxAmount          Decimal  @db.Decimal(10, 2)
-  invoicePdfUrl           String?
-  createdAt               DateTime @default(now())
-
-  @@index([invoiceNumber])
-  @@index([orderId])
 }
 
 // ============================================================================
@@ -540,31 +512,6 @@ model Review {
 
   @@index([productId])
   @@index([status])
-}
-
-model RawMaterial {
-  id               String                 @id @default(uuid())
-  name             String                 @unique
-  category         String
-  unit             String
-  currentStock     Decimal                @default(0.00) @db.Decimal(10, 2)
-  minimumThreshold Decimal                @default(5.00) @db.Decimal(10, 2)
-  costPerUnit      Decimal                @default(0.00) @db.Decimal(10, 2)
-  inventoryLogs    MaterialInventoryLog[]
-  createdAt        DateTime               @default(now())
-  updatedAt        DateTime               @updatedAt
-}
-
-model MaterialInventoryLog {
-  id              String      @id @default(uuid())
-  rawMaterialId   String
-  rawMaterial     RawMaterial @relation(fields: [rawMaterialId], references: [id], onDelete: Restrict)
-  quantityChanged Decimal     @db.Decimal(10, 2)
-  reason          String
-  referenceId     String?
-  createdAt       DateTime    @default(now())
-
-  @@index([rawMaterialId])
 }
 
 model Refund {

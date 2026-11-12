@@ -20,11 +20,10 @@ The Artआलय platform database architecture is engineered to balance **stric
 
 ### Key Architectural Tenets:
 1. **Zero License & Zero Lock-in:** 100% compliant with standard ANSI/ISO SQL and native PostgreSQL features. Runs seamlessly on local Docker containers, self-hosted Linux servers, or serverless DBs (Supabase, Neon, AWS RDS).
-2. **Indian Statutory & Fiscal Invariants:**
-   - Strict `NUMERIC(10, 2)` arithmetic for monetary amounts.
-   - Dual-address structure separating **Billing Address** (for Place of Supply / GSTIN) from **Shipping Address** (for courier logistics).
-   - HSN classification codes (`3926` for polymer resin articles, `4420` for inlaid woodcraft).
-   - Deterministic sequential tax invoice numbering (`INV-YYYY-XXXXX`) immutable once generated.
+2. **Strict Financial & Token Booking Invariants:**
+   - Strict `NUMERIC(10, 2)` arithmetic for monetary amounts (zero floating-point drift).
+   - Clear accounting for token deposit booking payments (`token_amount_paid`, `remaining_tentative_balance`) with custom artisanal WhatsApp confirmation.
+   - User-level data isolation down to individual order line items (`order_items.user_id REFERENCES users(id)`), preventing cross-tenant leakage.
 3. **Resin Physical Process State Machine:** The order and proof schemas strictly model the physical slow resin curing timeline, preventing premature dispatch before finishing QC. Exact delivery dates are confirmed dynamically with the customer over WhatsApp.
 4. **Zero-Drop Guest Checkout with Seamless Back-Linking:** Guest orders capture normalized customer contact points (`customer_phone`, `customer_email`) and are automatically claimed when a user creates an account with a matching verified phone number.
 
@@ -36,6 +35,7 @@ The Artआलय platform database architecture is engineered to balance **stric
 erDiagram
     USERS ||--o{ ADDRESSES : "has many"
     USERS ||--o{ ORDERS : "places"
+    USERS ||--o{ ORDER_ITEMS : "owns line item"
     USERS ||--o{ REVIEWS : "writes"
     USERS ||--o{ SAVED_DESIGNS : "saves"
     USERS ||--o{ SESSIONS : "authenticates"
@@ -48,7 +48,6 @@ erDiagram
 
     ORDERS ||--|{ ORDER_ITEMS : "contains"
     ORDERS ||--o{ PAYMENTS : "paid via"
-    ORDERS ||--o| TAX_INVOICES : "generates"
     ORDERS ||--o{ ORDER_STATUS_HISTORY : "tracks"
     ORDERS ||--o{ SHIPPING_MANIFESTS : "dispatched under"
     ORDERS ||--o{ REFUNDS : "refunded via"
@@ -62,7 +61,6 @@ erDiagram
     PRODUCTION_BATCHES ||--o{ BATCH_ORDER_ITEMS : "batches"
     ORDER_ITEMS ||--o| BATCH_ORDER_ITEMS : "grouped in"
 
-    RAW_MATERIALS ||--o{ MATERIAL_INVENTORY_LOGS : "audits"
     SHIPPING_MANIFESTS ||--o{ TRANSIT_EVENTS : "tracks"
 ```
 
@@ -70,7 +68,7 @@ erDiagram
 
 ## 3. Database Table Dictionary & Specification
 
-The schema comprises **24 relational tables** divided into 7 functional domains:
+The schema comprises **21 relational tables** divided into 7 functional domains:
 
 ### 3.1 Domain 1: Identity, RBAC & Customer Management (`EPIC 0`)
 
@@ -89,10 +87,8 @@ The schema comprises **24 relational tables** divided into 7 functional domains:
 | :--- | :--- | :--- |
 | `categories` | Product hierarchy (Nameplates, Keyrings, Bookmarks, Festive Decor). | Unique URL `slug`, sorting priority. |
 | `products` | Core product catalog records. | `base_price >= 0`, `product_type` (`READY_TO_SHIP` or `CUSTOMIZABLE`), `badge` enum, `customizer_config` JSONB. |
-| `product_images` | High-res gallery media, multi-angle shots, and zoom layers. | Cloudinary / CDN asset URLs, display order, primary cover flag. |
+| `product_images` | High-res gallery media, multi-angle shots, and zoom layers. | Cloudinary / Local upload asset URLs, display order, primary cover flag. |
 | `reviews` | Customer ratings and social proof testimonials. | `rating BETWEEN 1 AND 5`, moderation status (`PENDING`, `APPROVED`, `REJECTED`), verified purchaser flag. |
-| `raw_materials` | Workshop raw inventory tracking (Resin, Hardener, Timber Wood, Acrylic). | Low-stock threshold alerts, standard consumption units (kg, liters, sqft, count). |
-| `material_inventory_logs` | Immutable audit log of raw material depletion and restocks. | Batch receipt, order depletion deduction, timestamp. |
 
 ### 3.3 Domain 3: 2D Customizer Engine & User Designs (`EPIC 1`)
 
@@ -100,13 +96,12 @@ The schema comprises **24 relational tables** divided into 7 functional domains:
 | :--- | :--- | :--- |
 | `saved_designs` | User-saved customizer configurations and shareable deep links. | Unique 12-char nanoid `share_token`, complete canvas state in `design_state` JSONB, 300 DPI preview thumbnail URL. |
 
-### 3.4 Domain 4: Checkout, Orders & Indian Tax Compliance (`EPIC 3`)
+### 3.4 Domain 4: Checkout, Orders & Order Item Isolation (`EPIC 3`)
 
 | Table Name | Description | Key Invariants |
 | :--- | :--- | :--- |
-| `orders` | Master order header for both guest and authenticated customers. | Unique human-readable `order_number` (e.g. `ART-2026-1049`), subtotal, discounts, shipping, tax, grand total. Separate `shipping_address` & `billing_address` JSONB snapshots. |
-| `order_items` | Individual line items within an order. | References `products`, captures snapshot `unit_price`, HSN code (`3926` / `4420`), complete customized configuration in `customization_details` JSONB, and initial preview snapshot URL. |
-| `tax_invoices` | Official Indian GST tax invoices. | Deterministic sequence `INV-2026-00001`, seller GSTIN, consumer B2C invoicing, State code, CGST, SGST, IGST breakdown, signed PDF storage URL. |
+| `orders` | Master order header for both guest and authenticated customers. | Unique human-readable `order_number` (e.g. `ART-2026-1049`), subtotal, discounts, shipping, token deposit details, grand total. Snapped `shipping_address` & `billing_address` JSONB. |
+| `order_items` | Individual line items within an order with direct user ownership. | Explicitly linked to `user_id REFERENCES users(id)` (indexed via `idx_order_items_user_id`), references `products`, captures snapshot `unit_price`, complete customized configuration in `customization_details` JSONB, and initial preview snapshot URL. |
 | `coupons` | Promotional vouchers and discount codes. | `code` uppercase unique, discount type (`PERCENTAGE` / `FLAT_AMOUNT`), minimum cart threshold, usage limits. |
 | `coupon_usages` | Ledger tracking coupon redemptions per customer/order. | Prevents duplicate reuse of single-use welcome coupons. |
 | `order_status_history` | Immutable timeline tracking every order state transition. | Previous status, new status, transition actor (System, Customer, Artisan), timestamp, optional note. |
@@ -204,31 +199,27 @@ Captures all user-selected parameters across the 4 streamlined artisanal categor
 }
 ```
 
-### 4.2 Indian GST Breakdown (`orders.tax_details` & `tax_invoices.tax_breakdown`)
+### 4.2 Financial Breakdown & Token Booking Policy (`orders` & `order_items`)
 
 ```json
 {
-  "sellerStateCode": "27",
-  "placeOfSupplyStateCode": "27",
-  "isInterState": false,
-  "hsnSummary": [
+  "subtotal": 2199.00,
+  "discount": 0.00,
+  "shippingFee": 0.00,
+  "giftWrapFee": 99.00,
+  "grandTotal": 2298.00,
+  "isTokenDeposit": true,
+  "tokenAmountPaid": 199.00,
+  "remainingTentativeBalance": 2099.00,
+  "refundPolicyNotes": "50% of the token amount will be returned if final price or design is not agreed over WhatsApp.",
+  "items": [
     {
-      "hsnCode": "3926",
-      "description": "Customized Polymer Resin Nameplate",
-      "taxableAmount": 2117.80,
-      "cgstRate": 9.0,
-      "cgstAmount": 190.60,
-      "sgstRate": 9.0,
-      "sgstAmount": 190.60,
-      "igstRate": 0.0,
-      "igstAmount": 0.0,
-      "totalTax": 381.20
+      "productId": "prod_1794401892702",
+      "userId": "usr_patron_1049",
+      "quantity": 1,
+      "unitPrice": 2199.00
     }
-  ],
-  "totalCgst": 190.60,
-  "totalSgst": 190.60,
-  "totalIgst": 0.0,
-  "grandTaxTotal": 381.20
+  ]
 }
 ```
 
@@ -243,17 +234,16 @@ Captures all user-selected parameters across the 4 streamlined artisanal categor
 | `US-0.3` | Multi-Address Book | `addresses (user_id, full_name, street, pincode, state, is_default)` | Index on `(user_id, is_default)`; PIN code regex constraint. |
 | `US-0.4` | Password Reset | `password_reset_tokens (token, user_id, expires_at, is_used)` | Unique index on token; automatic expiry index. |
 | `US-0.5` | Guest Order Linking | `orders (customer_phone, user_id)`, `users (phone)` | Trigger auto-populates `user_id` when phone matches verified user. |
-| `US-1.1` to `US-1.6` | 2D Customizer Studio | `order_items (customization_details, preview_image_url)`, `products (customizer_config)` | GIN index on `customization_details` JSONB. |
+| `US-1.1` to `US-1.6` | 2D Customizer Studio | `order_items (user_id, customization_details, preview_image_url)`, `products (customizer_config)` | Foreign key `user_id REFERENCES users(id)` and GIN index on `customization_details` JSONB. |
 | `US-1.7` | Saved Custom Designs | `saved_designs (share_token, user_id, product_id, design_state, preview_url)` | Unique index on `share_token`; foreign keys to product and user. |
 | `US-2.1` to `US-2.3` | Catalog & Media | `products (slug, title, base_price, badge, is_active)`, `product_images (url, is_primary)` | Unique index on `slug`; index on `(category_id, is_active)`. |
 | `US-2.4` | Verified Buyer Reviews | `reviews (product_id, user_id, rating, comment, photo_urls, is_verified, status)` | Check `rating BETWEEN 1 AND 5`; index on `(product_id, status)`. |
 | `US-2.5` | Catalog Search | `products (title, subtitle, description, tags)` | PostgreSQL `to_tsvector('english', ...)` full-text search GIN index. |
-| `US-3.1` to `US-3.2` | Cart & Gifting Suite | `orders (is_gift, gift_message, gift_wrap_fee)`, `order_items` | Nullable gift message with character limit check `<= 300`. |
+| `US-3.1` to `US-3.2` | Cart & Gifting Suite | `orders (is_gift, gift_message, gift_wrap_fee)`, `order_items (user_id)` | Nullable gift message with character limit check `<= 300`. |
 | `US-3.3` | Razorpay Payments | `payments (order_id, razorpay_order_id, razorpay_payment_id, status, amount)` | Unique constraint on `razorpay_order_id` & `razorpay_payment_id`. |
-| `US-3.4` | Anti-RTO COD Deposit | `orders (is_cod_deposit, cod_deposit_amount, balance_cod_amount)` | Check `cod_deposit_amount + balance_cod_amount = grand_total`. |
+| `US-3.4` | Token Deposit Booking | `orders (is_token_deposit, token_amount_paid, remaining_tentative_balance)` | Check `token_amount_paid + remaining_tentative_balance = grand_total`. |
 | `US-3.6` | Guest Checkout | `orders (customer_phone, customer_email, shipping_address)` | Nullable `user_id` with NOT NULL `customer_phone`. |
 | `US-3.7` | Separate Bill/Ship Addr | `orders (shipping_address, billing_address, is_billing_same_as_shipping)` | JSONB validation schema with phone, name, and address lines. |
-| `US-3.8` | GST Tax Invoices | `tax_invoices (invoice_number, order_id, seller_gstin, total_tax, pdf_url)` | Unique sequential `invoice_number`; composite index on GSTIN. |
 | `US-3.9` | Coupons & Promotions | `coupons (code, discount_type, discount_value, min_order_value)`, `coupon_usages` | Unique uppercase index on `code`; check `discount_value > 0`. |
 | `US-3.10` | Cancellations & Refunds | `orders (status, cancellation_reason)`, `refunds (order_id, refund_amount, status)` | Cancellation allowed only if status in (`ORDER_CONFIRMED`, `PROOF_PENDING`). |
 | `US-4.1` to `US-4.4` | Proof Approval Loop | `proof_requests (order_item_id, status, proof_image_url, is_skipped)`, `proof_revisions` | Foreign key to `order_items`; revision counter capped at 2. |
@@ -261,7 +251,6 @@ Captures all user-selected parameters across the 4 streamlined artisanal categor
 | `US-5.4` | Transit Breakage Claims| `transit_breakage_claims (order_id, photo_proof_urls, status, replacement_order_id)`| Foreign key to `orders`; replacement order reference. |
 | `US-6.1` to `US-6.3` | Kanban & Batch Pours | `production_batches (colorway, resin_volume_ml, status)`, `batch_order_items` | Check `resin_volume_ml > 0`; index on batch status. |
 | `US-7.1` to `US-7.3` | Artisan Merchandising | `products (badge, compare_at_price, inventory_count, customizer_config)` | Enum check on `badge`; check `compare_at_price >= base_price`. |
-| `US-7.4` | Raw Material Inventory | `raw_materials (name, current_stock, minimum_threshold, unit)` | Check `current_stock >= 0`; alert trigger when below minimum. |
 | `US-7.6` | Analytics Aggregations | Materialized Views & Indexes on `orders (created_at, grand_total, status)` | Grouped aggregations by day, week, and product category. |
 
 ---

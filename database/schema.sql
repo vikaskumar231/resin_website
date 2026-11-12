@@ -255,8 +255,6 @@ CREATE TABLE IF NOT EXISTS products (
     low_stock_threshold INT NOT NULL DEFAULT 5 CHECK (low_stock_threshold >= 0),
     curing_lead_days INT NOT NULL DEFAULT 3 CHECK (curing_lead_days >= 1),
     dimensions VARCHAR(100),
-    hsn_code VARCHAR(10) NOT NULL DEFAULT '3926', -- HSN 3926 (Polymer Resin Art) or 4420 (Wood Inlaid)
-    gst_rate NUMERIC(5, 2) NOT NULL DEFAULT 18.00 CHECK (gst_rate IN (5.00, 12.00, 18.00, 28.00)),
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     customizer_config JSONB, -- Substrates, swatches, sizes, typography settings
     search_vector TSVECTOR, -- PostgreSQL Full-text search
@@ -332,8 +330,6 @@ CREATE TABLE IF NOT EXISTS orders (
     discount NUMERIC(10, 2) NOT NULL DEFAULT 0.00 CHECK (discount >= 0),
     coupon_id UUID REFERENCES coupons(id) ON DELETE SET NULL,
     shipping_fee NUMERIC(10, 2) NOT NULL DEFAULT 0.00 CHECK (shipping_fee >= 0),
-    tax_amount NUMERIC(10, 2) NOT NULL DEFAULT 0.00 CHECK (tax_amount >= 0),
-    tax_details JSONB, -- CGST, SGST, IGST breakdown
     grand_total NUMERIC(10, 2) NOT NULL CHECK (grand_total >= 0),
     
     -- Anti-RTO COD Deposit Governance
@@ -345,9 +341,6 @@ CREATE TABLE IF NOT EXISTS orders (
     shipping_address JSONB NOT NULL,
     billing_address JSONB,
     is_billing_same_as_shipping BOOLEAN NOT NULL DEFAULT TRUE,
-    
-    -- B2B GSTIN Information (Optional for Tax Credit)
-    b2b_details JSONB,
     
     -- Gifting Suite
     is_gift BOOLEAN NOT NULL DEFAULT FALSE,
@@ -372,11 +365,10 @@ CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at);
 CREATE TABLE IF NOT EXISTS order_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL, -- Direct user linkage for item-level data isolation
     product_id UUID NOT NULL REFERENCES products(id) ON DELETE RESTRICT,
     quantity INT NOT NULL DEFAULT 1 CHECK (quantity > 0),
     unit_price NUMERIC(10, 2) NOT NULL CHECK (unit_price >= 0),
-    hsn_code VARCHAR(10) NOT NULL DEFAULT '3926',
-    gst_rate NUMERIC(5, 2) NOT NULL DEFAULT 18.00,
     
     -- 2D Customizer JSON Snapshot & Rendered Proof Assets
     customization_details JSONB,
@@ -391,6 +383,7 @@ CREATE TABLE IF NOT EXISTS order_items (
 );
 
 CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_user_id ON order_items(user_id);
 CREATE INDEX IF NOT EXISTS idx_order_items_product_id ON order_items(product_id);
 CREATE INDEX IF NOT EXISTS idx_order_items_proof_status ON order_items(proof_status);
 CREATE INDEX IF NOT EXISTS idx_order_items_customization ON order_items USING GIN(customization_details);
@@ -429,30 +422,6 @@ CREATE TABLE IF NOT EXISTS payments (
 CREATE INDEX IF NOT EXISTS idx_payments_order_id ON payments(order_id);
 CREATE INDEX IF NOT EXISTS idx_payments_razorpay_order_id ON payments(razorpay_order_id);
 CREATE INDEX IF NOT EXISTS idx_payments_razorpay_payment_id ON payments(razorpay_payment_id);
-
--- 4.14 TAX INVOICES (Indian Statutory GST Invoices)
-CREATE TABLE IF NOT EXISTS tax_invoices (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    invoice_number VARCHAR(50) NOT NULL UNIQUE, -- e.g. 'INV-2026-00042'
-    order_id UUID NOT NULL UNIQUE REFERENCES orders(id) ON DELETE RESTRICT,
-    seller_legal_name VARCHAR(200) NOT NULL DEFAULT 'Artआलय Artisanal Works Private Limited',
-    seller_gstin VARCHAR(20) NOT NULL,
-    seller_state_code VARCHAR(5) NOT NULL DEFAULT '27', -- Maharashtra
-    buyer_legal_name VARCHAR(200) NOT NULL,
-    buyer_gstin VARCHAR(20), -- Optional B2B
-    place_of_supply_state_code VARCHAR(5) NOT NULL,
-    is_inter_state BOOLEAN NOT NULL DEFAULT FALSE,
-    taxable_amount NUMERIC(10, 2) NOT NULL CHECK (taxable_amount >= 0),
-    cgst_amount NUMERIC(10, 2) NOT NULL DEFAULT 0.00,
-    sgst_amount NUMERIC(10, 2) NOT NULL DEFAULT 0.00,
-    igst_amount NUMERIC(10, 2) NOT NULL DEFAULT 0.00,
-    total_tax_amount NUMERIC(10, 2) NOT NULL CHECK (total_tax_amount >= 0),
-    invoice_pdf_url TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX IF NOT EXISTS idx_tax_invoices_order_id ON tax_invoices(order_id);
-CREATE INDEX IF NOT EXISTS idx_tax_invoices_invoice_number ON tax_invoices(invoice_number);
 
 -- 4.15 PROOF REQUESTS & REVISIONS (Artisan WhatsApp Approval Loop)
 CREATE TABLE IF NOT EXISTS proof_requests (
@@ -574,30 +543,6 @@ CREATE TABLE IF NOT EXISTS reviews (
 CREATE INDEX IF NOT EXISTS idx_reviews_product_id ON reviews(product_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_status ON reviews(status);
 
--- 4.20 RAW MATERIALS & WORKSHOP INVENTORY (Resin & Wood Depletion Alerts)
-CREATE TABLE IF NOT EXISTS raw_materials (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(150) NOT NULL UNIQUE,
-    category VARCHAR(100) NOT NULL, -- 'EPOXY_RESIN', 'HARDENER', 'TIMBER_WOOD', 'PIGMENT', 'GOLD_FOIL'
-    unit VARCHAR(20) NOT NULL, -- 'kg', 'liter', 'sqft', 'leaf_pack'
-    current_stock NUMERIC(10, 2) NOT NULL DEFAULT 0 CHECK (current_stock >= 0),
-    minimum_threshold NUMERIC(10, 2) NOT NULL DEFAULT 5 CHECK (minimum_threshold >= 0),
-    cost_per_unit NUMERIC(10, 2) NOT NULL DEFAULT 0,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS material_inventory_logs (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    raw_material_id UUID NOT NULL REFERENCES raw_materials(id) ON DELETE RESTRICT,
-    quantity_changed NUMERIC(10, 2) NOT NULL, -- Positive for Restock, Negative for Production Pour
-    reason VARCHAR(100) NOT NULL, -- 'RESTOCK', 'BATCH_POUR', 'SCRAP_WASTAGE'
-    reference_id VARCHAR(100), -- Batch ID or PO Number
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX IF NOT EXISTS idx_inventory_logs_material ON material_inventory_logs(raw_material_id);
-
 -- 4.21 REFUNDS (Financial Cancellations & Compensations)
 CREATE TABLE IF NOT EXISTS refunds (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -626,7 +571,6 @@ CREATE TRIGGER set_timestamp_proof_requests BEFORE UPDATE ON proof_requests FOR 
 CREATE TRIGGER set_timestamp_batches BEFORE UPDATE ON production_batches FOR EACH ROW EXECUTE FUNCTION trigger_set_timestamp();
 CREATE TRIGGER set_timestamp_manifests BEFORE UPDATE ON shipping_manifests FOR EACH ROW EXECUTE FUNCTION trigger_set_timestamp();
 CREATE TRIGGER set_timestamp_reviews BEFORE UPDATE ON reviews FOR EACH ROW EXECUTE FUNCTION trigger_set_timestamp();
-CREATE TRIGGER set_timestamp_raw_materials BEFORE UPDATE ON raw_materials FOR EACH ROW EXECUTE FUNCTION trigger_set_timestamp();
 
 -- ============================================================================
 -- 6. FULL-TEXT SEARCH TRIGGER FOR PRODUCTS CATALOG
@@ -773,13 +717,4 @@ VALUES
     ('FESTIVE500', 'FLAT_AMOUNT', 500.00, 2999.00, 500, TRUE)
 ON CONFLICT (code) DO NOTHING;
 
--- 7.5 Seed Workshop Raw Materials
-INSERT INTO raw_materials (name, category, unit, current_stock, minimum_threshold, cost_per_unit)
-VALUES 
-    ('Crystal Clear Casting Epoxy Resin (Part A)', 'EPOXY_RESIN', 'kg', 45.00, 10.00, 650.00),
-    ('Optical Fast Hardener (Part B)', 'HARDENER', 'kg', 22.50, 5.00, 750.00),
-    ('Burmese Reclaimed Teakwood Planks (16x10)', 'TIMBER_WOOD', 'count', 38.00, 8.00, 480.00),
-    ('3mm Mirror Gold Cast Acrylic Sheets', 'ACRYLIC', 'sqft', 60.00, 15.00, 180.00),
-    ('24K Genuine Imitation Gold Foil Booklets', 'GOLD_FOIL', 'leaf_pack', 25.00, 5.00, 220.00)
-ON CONFLICT (name) DO NOTHING;
 

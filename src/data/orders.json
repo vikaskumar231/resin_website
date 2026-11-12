@@ -55,7 +55,8 @@
           "requirementsText": "",
           "referenceImage": null
         },
-        "id": "cart_1794410767586_10xzo"
+        "id": "cart_1794410767586_10xzo",
+        "userId": null
       }
     ]
   },
@@ -111,7 +112,8 @@
           "requirementsText": "",
           "referenceImage": null
         },
-        "id": "cart_1794407733888_7voog"
+        "id": "cart_1794407733888_7voog",
+        "userId": null
       }
     ]
   },
@@ -149,7 +151,8 @@
         "slug": "bespoke-teakwood-nameplate",
         "title": "Bespoke Natural Wood & Ocean Wave Resin Nameplate",
         "quantity": 1,
-        "unitPrice": 3499
+        "unitPrice": 3499,
+        "userId": "user_test_123"
       }
     ]
   },
@@ -196,7 +199,8 @@
           "hardwareFinish": "BRUSHED_BRASS_GOLD",
           "charm": "MINI_TASSEL"
         },
-        "title": "Crystal Monogram Resin Letter Keyring"
+        "title": "Crystal Monogram Resin Letter Keyring",
+        "userId": null
       }
     ]
   },
@@ -236,7 +240,8 @@
         "title": "Rose Pearl Shubh Labh Hanging",
         "unitPrice": 699,
         "quantity": 1,
-        "isCustomizable": false
+        "isCustomizable": false,
+        "userId": null
       }
     ]
   },
@@ -283,7 +288,8 @@
           "substrate": "RAW_TEAKWOOD",
           "colorway": "OCEAN_WAVE",
           "hasLedBacklight": true
-        }
+        },
+        "userId": null
       }
     ]
   },
@@ -336,7 +342,8 @@
           },
           "hasLedBacklight": true,
           "referenceImage": null
-        }
+        },
+        "userId": "user_cust_priya_01"
       }
     ]
   },
@@ -381,7 +388,8 @@
           "hardwareFinish": "ROSE_GOLD_LUXE",
           "charm": "MINI_TASSEL",
           "hasEngravedTag": false
-        }
+        },
+        "userId": "user_cust_priya_01"
       }
     ]
   },
@@ -423,7 +431,8 @@
             "line2": "108"
           },
           "hasLedBacklight": false
-        }
+        },
+        "userId": "user_cust_rahul_02"
       }
     ]
   }

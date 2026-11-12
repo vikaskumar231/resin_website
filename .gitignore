@@ -3,3 +3,5 @@ node_modules/
 BMAD-METHOD/
 .vercel/
 .env.local
+.vercel
+.env*
