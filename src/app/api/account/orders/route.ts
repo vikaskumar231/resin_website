@@ -29,16 +29,16 @@ export async function GET(req: NextRequest) {
       } else {
         orders = orderRepository.getAllOrders();
       }
-    } else if ((session?.valid && session.userId) || queryUserId || queryPhone || queryEmail) {
-      // Authenticated Customer: Match by verified session ID, or client-supplied contact credentials
-      const activeUserId = session?.valid ? session.userId : (queryUserId || null);
+    } else if (session?.valid && session.userId) {
+      // Authenticated Customer: STRICT ENFORCEMENT - ALWAYS use verified session.userId
+      const activeUserId = session.userId;
 
       // Load user profile to enrich contact points for seamless back-linking
       const allUsers = await userRepository.getAll();
-      const currentUser = activeUserId ? allUsers.find((u) => u.id === activeUserId) : null;
+      const currentUser = allUsers.find((u) => u.id === activeUserId);
 
-      const effectivePhone = currentUser?.phone || queryPhone || null;
-      const effectiveEmail = currentUser?.email || queryEmail || null;
+      const effectivePhone = currentUser?.phone || null;
+      const effectiveEmail = currentUser?.email || null;
       const effectiveName = currentUser?.name || null;
 
       orders = orderRepository.getOrdersForUser({
@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
         }
       }
     } else {
-      // Unauthenticated visitor with zero query credentials: Do NOT disclose customer orders or PII
+      // Unauthenticated visitor: STRICT SECURITY GATE - Disclose ZERO orders or PII
       return NextResponse.json({
         success: true,
         orders: [],

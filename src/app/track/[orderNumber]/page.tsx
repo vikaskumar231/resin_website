@@ -156,9 +156,16 @@ export default function OrderTrackingPage({ params }: TrackPageProps) {
               <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">
                 Order Status
               </span>
-              <h3 className="font-serif text-lg font-bold text-brand-emerald">
-                {order?.statusLabel || "Workshop Queue • WhatsApp Discussion Pending"}
-              </h3>
+              <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                <h3 className="font-serif text-lg font-bold text-brand-emerald">
+                  {order?.statusLabel || "Workshop Queue • WhatsApp Discussion Pending"}
+                </h3>
+                {order?.status && (
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-sand text-brand-emerald border border-brand-gold/40">
+                    {order.status.replace(/_/g, " ")}
+                  </span>
+                )}
+              </div>
             </div>
             <span className="text-xs text-slate-500 font-medium">
               Ref: {orderNumber}

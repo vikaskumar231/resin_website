@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { X, Search, Clock, ArrowRight, Sparkles, Package } from "lucide-react";
+import { X, Search, Clock, ArrowRight, Sparkles, Package, LogIn } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface TrackOrderModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface TrackOrderModalProps {
 
 export default function TrackOrderModal({ isOpen, onClose }: TrackOrderModalProps) {
   const router = useRouter();
+  const { isAuthenticated, openAuthModal } = useAuthStore();
   const [orderNumber, setOrderNumber] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -96,12 +98,25 @@ export default function TrackOrderModal({ isOpen, onClose }: TrackOrderModalProp
               type="button"
               onClick={() => {
                 onClose();
-                router.push("/account/orders");
+                if (isAuthenticated) {
+                  router.push("/account/orders");
+                } else {
+                  openAuthModal("LOGIN");
+                }
               }}
-              className="w-full py-2.5 rounded-2xl hover:bg-brand-sand text-brand-emerald font-semibold text-xs transition-colors flex items-center justify-center gap-1.5"
+              className="w-full py-2.5 rounded-2xl hover:bg-brand-sand text-brand-emerald font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              <Package className="w-3.5 h-3.5" />
-              <span>View All My Orders</span>
+              {isAuthenticated ? (
+                <>
+                  <Package className="w-3.5 h-3.5" />
+                  <span>View All My Orders</span>
+                </>
+              ) : (
+                <>
+                  <LogIn className="w-3.5 h-3.5 text-brand-teal" />
+                  <span>Sign In to View All My Orders</span>
+                </>
+              )}
             </button>
           </div>
         </form>

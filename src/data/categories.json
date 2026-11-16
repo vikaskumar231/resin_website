@@ -88,5 +88,50 @@
     "description": "Heat-resistant bespoke geode drink coasters",
     "isDefault": false,
     "displayOrder": 12
+  },
+  {
+    "id": "UAT_CAT_1794803519807",
+    "slug": "resin-coasters-1794803519807",
+    "label": "Artisanal Resin Coasters",
+    "icon": "☕",
+    "description": "Heat-resistant bespoke geode drink coasters",
+    "isDefault": false,
+    "displayOrder": 13
+  },
+  {
+    "id": "UAT_CAT_1794804007450",
+    "slug": "resin-coasters-1794804007450",
+    "label": "Artisanal Resin Coasters",
+    "icon": "☕",
+    "description": "Heat-resistant bespoke geode drink coasters",
+    "isDefault": false,
+    "displayOrder": 14
+  },
+  {
+    "id": "UAT_CAT_1794804028391",
+    "slug": "resin-coasters-1794804028391",
+    "label": "Artisanal Resin Coasters",
+    "icon": "☕",
+    "description": "Heat-resistant bespoke geode drink coasters",
+    "isDefault": false,
+    "displayOrder": 15
+  },
+  {
+    "id": "UAT_CAT_1794805098446",
+    "slug": "resin-coasters-1794805098446",
+    "label": "Artisanal Resin Coasters",
+    "icon": "☕",
+    "description": "Heat-resistant bespoke geode drink coasters",
+    "isDefault": false,
+    "displayOrder": 16
+  },
+  {
+    "id": "UAT_CAT_1794805114605",
+    "slug": "resin-coasters-1794805114605",
+    "label": "Artisanal Resin Coasters",
+    "icon": "☕",
+    "description": "Heat-resistant bespoke geode drink coasters",
+    "isDefault": false,
+    "displayOrder": 17
   }
 ]

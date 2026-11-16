@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
-import { Layers, AlertTriangle, Plus, RefreshCw, CheckCircle2, ArrowLeft } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
+import { Layers, AlertTriangle, Plus, RefreshCw, CheckCircle2, ArrowLeft, Lock } from "lucide-react";
 
 interface MaterialItem {
   id: string;
@@ -17,6 +18,8 @@ interface MaterialItem {
 }
 
 export default function WorkshopInventoryPage() {
+  const { user, isAuthenticated, openAuthModal } = useAuthStore();
+  const isArtisanAdmin = isAuthenticated && user?.role === "ARTISAN_ADMIN";
   const [materials, setMaterials] = useState<MaterialItem[]>([
     {
       id: "mat_01",
@@ -70,6 +73,46 @@ export default function WorkshopInventoryPage() {
       prev.map((m) => (m.id === id ? { ...m, currentStock: m.currentStock + amount } : m))
     );
   };
+
+  // Strict RBAC Guard: Require ARTISAN_ADMIN role
+  if (!isAuthenticated || !isArtisanAdmin) {
+    return (
+      <div className="min-h-screen bg-brand-ivory text-brand-charcoal flex flex-col selection:bg-brand-gold/30">
+        <Navbar />
+        <main className="flex-1 py-16 max-w-2xl mx-auto px-4 sm:px-6 w-full text-center flex flex-col items-center justify-center space-y-6">
+          <div className="w-16 h-16 rounded-full bg-amber-100 border-2 border-amber-300 text-amber-800 flex items-center justify-center shadow-md">
+            <Lock className="w-8 h-8 text-amber-700" />
+          </div>
+          <div className="space-y-2">
+            <span className="text-xs font-bold uppercase tracking-widest text-brand-gold">
+              Security &amp; RBAC Access Gate
+            </span>
+            <h1 className="text-3xl font-serif font-bold text-brand-emerald">
+              Artisan Administrator Login Required
+            </h1>
+            <p className="text-xs sm:text-sm text-brand-charcoal/70 max-w-md mx-auto">
+              Workshop raw material telemetry and inventory procurement calculations require verified artisan credentials.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+            <button
+              onClick={() => openAuthModal("LOGIN")}
+              className="px-7 py-3 rounded-full bg-brand-emerald hover:bg-brand-teal text-white font-bold text-xs uppercase tracking-wider shadow-md transition-all cursor-pointer"
+            >
+              Sign In as Artisan Lead
+            </button>
+            <Link
+              href="/"
+              className="px-7 py-3 rounded-full bg-brand-sand hover:bg-white border border-brand-sand text-brand-charcoal font-semibold text-xs transition-all"
+            >
+              Return to Storefront
+            </Link>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-brand-ivory text-brand-charcoal flex flex-col selection:bg-brand-gold/30">

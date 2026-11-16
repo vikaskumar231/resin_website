@@ -7,6 +7,7 @@ import Footer from "@/components/common/Footer";
 import { ProductCatalogItem } from "@/lib/mockData";
 import { useProductStore } from "@/store/useProductStore";
 import { useCategoryStore } from "@/store/useCategoryStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import { compressImageToLimit } from "@/lib/imageCompressor";
 import {
   Plus,
@@ -35,6 +36,7 @@ import {
   FolderOpen,
   Camera,
   RefreshCw,
+  Lock,
 } from "lucide-react";
 
 type CategoryFilter = string;
@@ -66,6 +68,7 @@ const PRESET_IMAGES = [
 
 export default function ArtisanProductsPage() {
   const [isMounted, setIsMounted] = useState(false);
+  const { user, isAuthenticated, openAuthModal } = useAuthStore();
   const { products, addProduct, updateProduct, updatePrice, updateBadge, deleteProduct, fetchProducts } = useProductStore();
   const { categories, fetchCategories } = useCategoryStore();
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
@@ -498,6 +501,46 @@ export default function ArtisanProductsPage() {
         <main className="flex-1 py-8 sm:py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-6 animate-pulse">
           <div className="h-10 bg-brand-sand/50 rounded-2xl w-64 mb-6" />
           <div className="h-64 bg-brand-sand/30 rounded-3xl w-full" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Security Gate: Artisan Admin role strictly required
+  if (!isAuthenticated || user?.role !== "ARTISAN_ADMIN") {
+    return (
+      <div className="min-h-screen bg-brand-ivory text-brand-charcoal flex flex-col selection:bg-brand-gold/30">
+        <Navbar />
+        <main className="flex-1 py-16 max-w-2xl mx-auto px-4 sm:px-6 w-full text-center flex flex-col items-center justify-center space-y-6">
+          <div className="w-16 h-16 rounded-full bg-amber-100 border-2 border-amber-300 text-amber-800 flex items-center justify-center shadow-md">
+            <Lock className="w-8 h-8 text-amber-700" />
+          </div>
+          <div className="space-y-2">
+            <span className="text-xs font-bold uppercase tracking-widest text-brand-gold">
+              Security &amp; RBAC Access Gate
+            </span>
+            <h1 className="text-3xl font-serif font-bold text-brand-emerald">
+              Artisan Administrator Login Required
+            </h1>
+            <p className="text-xs sm:text-sm text-brand-charcoal/70 max-w-md mx-auto">
+              The product catalog management console requires verified artisan credentials. Please sign in with an administrator account to add, edit, or modify catalog listings.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+            <button
+              onClick={() => openAuthModal("LOGIN")}
+              className="px-7 py-3 rounded-full bg-brand-emerald hover:bg-brand-teal text-white font-bold text-xs uppercase tracking-wider shadow-md transition-all cursor-pointer"
+            >
+              Sign In as Artisan Lead
+            </button>
+            <Link
+              href="/"
+              className="px-7 py-3 rounded-full bg-brand-sand hover:bg-white border border-brand-sand text-brand-charcoal font-semibold text-xs transition-all"
+            >
+              Return to Storefront
+            </Link>
+          </div>
         </main>
         <Footer />
       </div>

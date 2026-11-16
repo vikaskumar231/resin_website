@@ -52,12 +52,10 @@ export async function middleware(request: NextRequest) {
       hasValidBearer = mismatch === 0;
     }
 
-    // For REST API endpoints & mutations: strictly require cryptographic HMAC session or Bearer API key
-    // For HTML page routes (/admin/*): allow verified cryptographic session, Bearer key, or verified artisan role cookie
-    const isApiRoute = pathname.startsWith("/api/");
-    const isAuthorized = isApiRoute
-      ? hasValidSession || hasValidBearer
-      : hasValidSession || hasValidBearer || roleCookie === "ARTISAN_ADMIN";
+    // Cryptographic Authorization Enforcement:
+    // Both HTML page routes (/admin/*) and REST API routes (/api/admin/*) strictly require
+    // a cryptographically verified HMAC session or server Bearer API key. Plaintext client cookies are never trusted.
+    const isAuthorized = hasValidSession || hasValidBearer;
 
     if (!isAuthorized) {
       // For REST API endpoints, return immediate HTTP 401 Unauthorized JSON

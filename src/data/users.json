@@ -174,5 +174,115 @@
     "passwordHash": "1a781014ee2d79545ee61f11c682dc0bc0a5b535bc83a2016ef75ea203c1f0e1e2c7d797db7293e7a3f79957e7a6f537be2c26631049a9d3685887aed743af20",
     "salt": "d065c508081728bf859aedaa9f9f5687",
     "createdAt": "2026-11-16T03:37:29.373Z"
+  },
+  {
+    "id": "user_cust_1794803519816_bk9g",
+    "username": "patron_uat_1794803519807",
+    "name": "Aarav Deshmukh",
+    "email": "aarav_uat_1794803519807@deshmukh.in",
+    "phone": "+91 98230 11223",
+    "role": "CUSTOMER",
+    "passwordHash": "2dfdb833de1e2a68a4ec5d42abab0359d220ac8a9f6b5740f75767f7980b2bac86edf3220f1dfda91a5aed22a1a4850a54cabdea3639f99ef47e469fd643527a",
+    "salt": "2f4eea62aa63ed34d9a9a61a88c38556",
+    "createdAt": "2026-11-16T04:31:59.816Z"
+  },
+  {
+    "id": "user_cust_1794803519864_gaff",
+    "username": "radha_converted_1794803519807",
+    "name": "Radha Krishnan",
+    "email": "guest_1794803519807@krishnan.in",
+    "phone": "+91 99112 23344",
+    "role": "CUSTOMER",
+    "passwordHash": "ecd726f818225644f9ca80c2c2a428165a8b0f10933b1cb220d54d48dee965f77b7c15087962990862c535b9b1b8de78ee3c510857dab7776cad38a0ebe8c5f1",
+    "salt": "bddafb460036902209b74c5f52e8a2ce",
+    "createdAt": "2026-11-16T04:31:59.864Z"
+  },
+  {
+    "id": "user_cust_1794804007460_jyt1",
+    "username": "patron_uat_1794804007450",
+    "name": "Aarav Deshmukh",
+    "email": "aarav_uat_1794804007450@deshmukh.in",
+    "phone": "+91 98230 11223",
+    "role": "CUSTOMER",
+    "passwordHash": "9960c089ecc4b8535f296ec2647e3b81c262c246a5cceaeb1b13b48bd22c12d23ea5869c5945e1627aad116754c32ec1ebfc6ed12d13c3700f5c461d2158ce7e",
+    "salt": "88b965c5c7ff9ad8ed4f9075e63adf53",
+    "createdAt": "2026-11-16T04:40:07.460Z"
+  },
+  {
+    "id": "user_cust_1794804007511_uqcd",
+    "username": "radha_converted_1794804007450",
+    "name": "Radha Krishnan",
+    "email": "guest_1794804007450@krishnan.in",
+    "phone": "+91 99112 23344",
+    "role": "CUSTOMER",
+    "passwordHash": "8c254c42801c4b5743576652ea607118743113c318ad2dfa1a8853918820c958c73a1229d4f2698814196a9ac13eaf4567508726c78d0ff7b092e9085e00a36c",
+    "salt": "74534826f10f60bdb7cd81ca87d6ea16",
+    "createdAt": "2026-11-16T04:40:07.511Z"
+  },
+  {
+    "id": "user_cust_1794804028400_zrq4",
+    "username": "patron_uat_1794804028391",
+    "name": "Aarav Deshmukh",
+    "email": "aarav_uat_1794804028391@deshmukh.in",
+    "phone": "+91 98230 11223",
+    "role": "CUSTOMER",
+    "passwordHash": "86587ccbcab10dd2860919c7782b33d9f3c032b7594280433f97d32b80d120b8d9c575261c522b8e082933e2311ef75b89f623fe1e83bc35ce1b8b9155ac14c0",
+    "salt": "e516e1aaec6a428a2c92ecd970466e56",
+    "createdAt": "2026-11-16T04:40:28.400Z"
+  },
+  {
+    "id": "user_cust_1794804028451_wn58",
+    "username": "radha_converted_1794804028391",
+    "name": "Radha Krishnan",
+    "email": "guest_1794804028391@krishnan.in",
+    "phone": "+91 99112 23344",
+    "role": "CUSTOMER",
+    "passwordHash": "ee82c43bd47c0f8a37792ae7e66aa0010c6664ca915786360af7c565e2d30258899fe3f1bf2a950e36aed236c0d536603d225809934e25fe78d509545d3d6c16",
+    "salt": "45a37c1adf4b1f90d15cbf1c236423af",
+    "createdAt": "2026-11-16T04:40:28.451Z"
+  },
+  {
+    "id": "user_cust_1794805098455_rsgu",
+    "username": "patron_uat_1794805098446",
+    "name": "Aarav Deshmukh",
+    "email": "aarav_uat_1794805098446@deshmukh.in",
+    "phone": "+91 98230 11223",
+    "role": "CUSTOMER",
+    "passwordHash": "e11eaccd1886a44ea3862a2fb8015c6ed1ebe4a10e291275303cd5bc786cafe956692350d71e0caf8c542e1e97f191eea260dbd9fa3bd9c3d8eccfe9e927a849",
+    "salt": "76c28be3263ab5df5de17b9b54a5a16c",
+    "createdAt": "2026-11-16T04:58:18.455Z"
+  },
+  {
+    "id": "user_cust_1794805098519_zzmd",
+    "username": "radha_converted_1794805098446",
+    "name": "Radha Krishnan",
+    "email": "guest_1794805098446@krishnan.in",
+    "phone": "+91 99112 23344",
+    "role": "CUSTOMER",
+    "passwordHash": "5bfae4269326deb46e1bcaed16d3bdda0acab89535c882b7cb40ad030e2543571ab0252585deafc7cd50958e2d28910b42c1edf99a02c377c470caf9cf81ee65",
+    "salt": "771e7d01cb34f3368228aa4ec0400c1e",
+    "createdAt": "2026-11-16T04:58:18.519Z"
+  },
+  {
+    "id": "user_cust_1794805114616_su84",
+    "username": "patron_uat_1794805114605",
+    "name": "Aarav Deshmukh",
+    "email": "aarav_uat_1794805114605@deshmukh.in",
+    "phone": "+91 98230 11223",
+    "role": "CUSTOMER",
+    "passwordHash": "84db1becd351e934df25f5a01f3c91a6b5e6f4155738163c76929e4ea6db795a90b788622ed8d6fd952caff82a471af26a1eefe0211a1f62a86572bdc29cf92a",
+    "salt": "b730863cea7952b3d5854e92a9a0305d",
+    "createdAt": "2026-11-16T04:58:34.616Z"
+  },
+  {
+    "id": "user_cust_1794805114684_w1m0",
+    "username": "radha_converted_1794805114605",
+    "name": "Radha Krishnan",
+    "email": "guest_1794805114605@krishnan.in",
+    "phone": "+91 99112 23344",
+    "role": "CUSTOMER",
+    "passwordHash": "5b228a10e8313bac24d7fe7450687667afd93b3c91eb9de8d6ad0d255ff2c04b7c50c9faee04c64b3dbc957917cbafa2938e710eb09b13ad90b596ffa761670d",
+    "salt": "64b7cfb1ce6ed9c17102f6ff0611724b",
+    "createdAt": "2026-11-16T04:58:34.684Z"
   }
 ]

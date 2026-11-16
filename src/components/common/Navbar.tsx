@@ -19,6 +19,7 @@ import {
   User,
   Truck,
   Package,
+  FileText,
 } from "lucide-react";
 import TrackOrderModal from "@/components/common/TrackOrderModal";
 
@@ -201,6 +202,26 @@ export default function Navbar() {
                   </div>
 
                   <Link
+                    href="/admin/orders"
+                    prefetch={false}
+                    onClick={() => setAdminDropdownOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-brand-charcoal hover:bg-brand-emerald/10 hover:text-brand-emerald transition-colors"
+                  >
+                    <Package className="w-4 h-4 text-brand-teal" />
+                    Active Orders
+                  </Link>
+
+                  <Link
+                    href="/admin/orders/completed"
+                    prefetch={false}
+                    onClick={() => setAdminDropdownOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-brand-charcoal hover:bg-brand-emerald/10 hover:text-brand-emerald transition-colors"
+                  >
+                    <FileText className="w-4 h-4 text-brand-teal" />
+                    Completed Orders
+                  </Link>
+
+                  <Link
                     href="/admin/categories"
                     prefetch={false}
                     onClick={() => setAdminDropdownOpen(false)}
@@ -327,6 +348,24 @@ export default function Navbar() {
 
                 {isArtisanAdmin ? (
                   <div className="pt-2 border-t border-brand-sand grid grid-cols-2 gap-2 text-[11px]">
+                    <Link
+                      href="/admin/orders"
+                      prefetch={false}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="p-2.5 rounded-xl bg-brand-sand/60 text-brand-emerald font-semibold flex items-center justify-center gap-1.5 text-center"
+                    >
+                      <Package className="w-3.5 h-3.5 text-brand-teal shrink-0" />
+                      <span>Active Orders</span>
+                    </Link>
+                    <Link
+                      href="/admin/orders/completed"
+                      prefetch={false}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="p-2.5 rounded-xl bg-brand-sand/60 text-brand-emerald font-semibold flex items-center justify-center gap-1.5 text-center"
+                    >
+                      <FileText className="w-3.5 h-3.5 text-brand-teal shrink-0" />
+                      <span>Completed</span>
+                    </Link>
                     <Link
                       href="/admin/categories"
                       prefetch={false}

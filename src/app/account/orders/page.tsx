@@ -19,6 +19,8 @@ import {
   ChevronRight,
   AlertCircle,
   ShoppingBag,
+  LogIn,
+  UserPlus,
 } from "lucide-react";
 
 interface OrderItem {
@@ -76,27 +78,36 @@ export default function CustomerOrdersPage() {
 
   useEffect(() => {
     async function fetchOrders() {
+      if (!isAuthenticated || !user) {
+        setOrders([]);
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       try {
         const queryParams = new URLSearchParams();
-        if (user?.id) queryParams.set("userId", user.id);
-        if (user?.phone) queryParams.set("phone", user.phone);
-        if (user?.email) queryParams.set("email", user.email);
+        if (user.id) queryParams.set("userId", user.id);
+        if (user.phone) queryParams.set("phone", user.phone);
+        if (user.email) queryParams.set("email", user.email);
 
         const res = await fetch(`/api/account/orders?${queryParams.toString()}`);
         const data = await res.json();
         if (data.success && Array.isArray(data.orders)) {
           setOrders(data.orders);
+        } else {
+          setOrders([]);
         }
       } catch (err) {
         console.error("Failed to load customer orders:", err);
+        setOrders([]);
       } finally {
         setLoading(false);
       }
     }
 
     fetchOrders();
-  }, [user]);
+  }, [user, isAuthenticated]);
 
   const filteredOrders = orders.filter((ord) => {
     if (filter === "ACTIVE") {
@@ -108,12 +119,12 @@ export default function CustomerOrdersPage() {
     return true;
   });
 
-  const getStatusBadge = (status: string, stageIndex: number) => {
+  const getStatusBadge = (status: string, stageIndex?: number) => {
     if (status === "DELIVERED") {
       return (
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-          Delivered
+          Delivered &amp; Settled
         </span>
       );
     }
@@ -125,26 +136,57 @@ export default function CustomerOrdersPage() {
         </span>
       );
     }
-    if (status === "SLOW_CURING_48H" || stageIndex === 4) {
+    if (status === "FINISHING_QC") {
       return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 shadow-xs">
-          <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-          Stage 4: Workshop Crafting &amp; Finishing
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-900 border border-indigo-300">
+          <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+          Finishing &amp; QC
         </span>
       );
     }
-    if (status === "PROOF_PENDING" || stageIndex === 2) {
+    if (status === "SLOW_CURING_48H") {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-teal-100 text-teal-900 border border-teal-300">
+          <Clock className="w-3.5 h-3.5 text-teal-600" />
+          Resin Curing in Studio
+        </span>
+      );
+    }
+    if (status === "IN_PRODUCTION") {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 shadow-xs">
+          <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+          In Studio Handcrafting
+        </span>
+      );
+    }
+    if (status === "PROOF_APPROVED") {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-900 border border-emerald-300">
+          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+          Proof Approved
+        </span>
+      );
+    }
+    if (status === "PROOF_PENDING" || status === "DESIGN_DISCUSSION") {
       return (
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-900 border border-purple-300">
           <Clock className="w-3.5 h-3.5 text-purple-600" />
-          Stage 2: WhatsApp Proof &amp; Date Confirmation
+          WhatsApp Consultation Pending
+        </span>
+      );
+    }
+    if (status === "CANCELLED") {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-900 border border-red-300">
+          Order Cancelled
         </span>
       );
     }
     return (
       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-brand-sand text-brand-emerald border border-brand-gold/40">
         <Sparkles className="w-3.5 h-3.5 text-brand-gold" />
-        In Workshop Production
+        Order Confirmed
       </span>
     );
   };
@@ -154,131 +196,188 @@ export default function CustomerOrdersPage() {
       <Navbar />
 
       <main className="flex-1 py-10 sm:py-16 max-w-5xl mx-auto px-4 sm:px-6 w-full space-y-8">
-        {/* Header Breadcrumb & Customer Profile Bar */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-brand-sand shadow-soft flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-brand-sand text-[11px] font-bold text-brand-emerald">
-              <Package className="w-3.5 h-3.5 text-brand-gold" />
-              <span>Customer Account &amp; Orders</span>
+        {!isAuthenticated ? (
+          /* Unauthenticated Security Gate: Zero orders exposed without login */
+          <div className="bg-white rounded-3xl p-8 sm:p-12 border border-brand-sand shadow-soft text-center max-w-xl mx-auto space-y-6">
+            <div className="w-16 h-16 rounded-full bg-brand-sand flex items-center justify-center text-brand-emerald mx-auto shadow-2xs">
+              <Package className="w-8 h-8 text-brand-teal" />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-brand-emerald">
-              {user ? `Namaste, ${user.name}` : "My Orders"}
-            </h1>
-            <p className="text-xs sm:text-sm text-brand-charcoal/70">
-              {user?.email || "Review your custom creations, WhatsApp consultation status, and order receipts."}
-              {user?.phone ? ` • ${user.phone}` : ""}
-            </p>
-          </div>
 
-          {/* Quick Order Lookup Form */}
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (lookupOrderNumber.trim()) {
-                window.location.href = `/track/${lookupOrderNumber.trim().toUpperCase()}`;
-              }
-            }}
-            className="w-full md:w-auto flex items-center gap-2 bg-brand-ivory p-1.5 rounded-2xl border border-brand-sand shadow-xs"
-          >
-            <div className="relative flex-1 sm:w-60">
-              <Search className="w-4 h-4 text-brand-charcoal/40 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Enter Order # (ART-...)"
-                value={lookupOrderNumber}
-                onChange={(e) => setLookupOrderNumber(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-xs bg-transparent border-0 focus:outline-hidden font-mono uppercase font-bold placeholder:normal-case placeholder:font-sans placeholder:font-normal placeholder:text-slate-400"
-              />
-            </div>
-            <button
-              type="submit"
-              className="px-4 py-2 rounded-xl bg-brand-emerald hover:bg-brand-teal text-white text-xs font-bold transition-colors shrink-0 flex items-center gap-1"
-            >
-              <span>Track</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </form>
-        </div>
-
-        {/* Not Authenticated Helper Banner */}
-        {!isAuthenticated && (
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-emerald-50 border border-brand-sand flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 text-brand-gold shrink-0" />
-              <p className="text-xs text-brand-charcoal/80">
-                Sign in to view your complete order history, view order receipts, and connect with the artisan on WhatsApp for proof and delivery coordination.
+            <div className="space-y-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-gold block">
+                Patron Security &amp; Order Privacy
+              </span>
+              <h1 className="text-2xl sm:text-3xl font-serif font-bold text-brand-emerald">
+                Sign In to View Your Orders
+              </h1>
+              <p className="text-xs sm:text-sm text-brand-charcoal/70 leading-relaxed">
+                Order details and bespoke resin craftsmanship are private and strictly bound to your patron account. Please sign in to view your personalized order history, delivery schedule, and receipts.
               </p>
             </div>
-            <button
-              onClick={() => openAuthModal("LOGIN")}
-              className="px-4 py-2 rounded-full bg-brand-emerald text-white text-xs font-bold hover:bg-brand-teal shrink-0 shadow-xs transition-colors"
-            >
-              Sign In to Account
-            </button>
-          </div>
-        )}
 
-        {/* Filter Tabs */}
-        <div className="flex items-center gap-2 border-b border-brand-sand/70 pb-3">
-          <button
-            onClick={() => setFilter("ALL")}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
-              filter === "ALL"
-                ? "bg-brand-emerald text-white shadow-xs"
-                : "bg-white text-brand-charcoal/70 hover:bg-brand-sand border border-brand-sand"
-            }`}
-          >
-            All Orders ({orders.length})
-          </button>
-          <button
-            onClick={() => setFilter("ACTIVE")}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
-              filter === "ACTIVE"
-                ? "bg-brand-emerald text-white shadow-xs"
-                : "bg-white text-brand-charcoal/70 hover:bg-brand-sand border border-brand-sand"
-            }`}
-          >
-            In Discussion / Production (
-            {orders.filter((o) => o.status !== "DELIVERED" && o.status !== "CANCELLED").length})
-          </button>
-          <button
-            onClick={() => setFilter("DELIVERED")}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
-              filter === "DELIVERED"
-                ? "bg-brand-emerald text-white shadow-xs"
-                : "bg-white text-brand-charcoal/70 hover:bg-brand-sand border border-brand-sand"
-            }`}
-          >
-            Delivered ({orders.filter((o) => o.status === "DELIVERED").length})
-          </button>
-        </div>
-
-        {/* Orders List */}
-        {loading ? (
-          <div className="p-12 text-center bg-white rounded-3xl border border-brand-sand space-y-3">
-            <div className="w-8 h-8 border-2 border-brand-gold border-t-transparent rounded-full animate-spin mx-auto" />
-            <p className="text-xs font-bold text-brand-charcoal/60">Loading your bespoke creations...</p>
-          </div>
-        ) : filteredOrders.length === 0 ? (
-          <div className="p-12 text-center bg-white rounded-3xl border border-brand-sand space-y-4">
-            <div className="w-16 h-16 rounded-full bg-brand-sand flex items-center justify-center text-brand-emerald mx-auto">
-              <ShoppingBag className="w-8 h-8 text-brand-teal" />
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <button
+                onClick={() => openAuthModal("LOGIN")}
+                className="w-full sm:w-auto px-6 py-3 rounded-full bg-brand-emerald hover:bg-brand-teal text-white text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <LogIn className="w-4 h-4 text-brand-gold" />
+                <span>Sign In to Account</span>
+              </button>
+              <button
+                onClick={() => openAuthModal("REGISTER")}
+                className="w-full sm:w-auto px-6 py-3 rounded-full bg-white hover:bg-brand-sand text-brand-emerald border-2 border-brand-emerald text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <UserPlus className="w-4 h-4 text-brand-teal" />
+                <span>Register New Account</span>
+              </button>
             </div>
-            <div className="space-y-1">
-              <h3 className="font-serif text-lg font-bold text-brand-emerald">No orders found</h3>
-              <p className="text-xs text-brand-charcoal/70 max-w-sm mx-auto">
-                Looking for an order placed as a guest? Enter your Order Reference number above to track it instantly.
+
+            {/* Guest Single Order Lookup Option */}
+            <div className="pt-6 border-t border-brand-sand/70 space-y-3">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                Placed an order as a guest?
+              </span>
+              <p className="text-xs text-slate-500">
+                You can track any individual order directly using your unique Order Reference code without signing in.
               </p>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (lookupOrderNumber.trim()) {
+                    window.location.href = `/track/${lookupOrderNumber.trim().toUpperCase()}`;
+                  }
+                }}
+                className="flex items-center gap-2 max-w-sm mx-auto"
+              >
+                <div className="relative flex-1">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="e.g. ART-2026-1049"
+                    value={lookupOrderNumber}
+                    onChange={(e) => setLookupOrderNumber(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-brand-sand/40 border border-brand-sand font-mono uppercase text-xs font-bold focus:outline-none focus:border-brand-emerald"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-brand-emerald text-white text-xs font-bold hover:bg-brand-teal transition-colors shrink-0"
+                >
+                  Track Order
+                </button>
+              </form>
             </div>
-            <Link
-              href="/customize"
-              className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-full bg-brand-emerald text-white text-xs font-bold hover:bg-brand-teal transition-colors shadow-sm"
-            >
-              <Sparkles className="w-4 h-4 text-brand-gold" />
-              <span>Explore 2D Customizer Studio</span>
-            </Link>
           </div>
         ) : (
+          /* Authenticated Patron Orders Dashboard */
+          <>
+            {/* Header Breadcrumb & Customer Profile Bar */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-brand-sand shadow-soft flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-brand-sand text-[11px] font-bold text-brand-emerald">
+                  <Package className="w-3.5 h-3.5 text-brand-gold" />
+                  <span>Customer Account &amp; Orders</span>
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-serif font-bold text-brand-emerald">
+                  Namaste, {user?.name}
+                </h1>
+                <p className="text-xs sm:text-sm text-brand-charcoal/70">
+                  {user?.email || "Review your custom creations, WhatsApp consultation status, and order receipts."}
+                  {user?.phone ? ` • ${user.phone}` : ""}
+                </p>
+              </div>
+
+              {/* Quick Order Lookup Form */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (lookupOrderNumber.trim()) {
+                    window.location.href = `/track/${lookupOrderNumber.trim().toUpperCase()}`;
+                  }
+                }}
+                className="w-full md:w-auto flex items-center gap-2 bg-brand-ivory p-1.5 rounded-2xl border border-brand-sand shadow-xs"
+              >
+                <div className="relative flex-1 sm:w-60">
+                  <Search className="w-4 h-4 text-brand-charcoal/40 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Enter Order # (ART-...)"
+                    value={lookupOrderNumber}
+                    onChange={(e) => setLookupOrderNumber(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 text-xs bg-transparent border-0 focus:outline-hidden font-mono uppercase font-bold placeholder:normal-case placeholder:font-sans placeholder:font-normal placeholder:text-slate-400"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-brand-emerald hover:bg-brand-teal text-white text-xs font-bold transition-colors shrink-0 flex items-center gap-1"
+                >
+                  <span>Track</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </form>
+            </div>
+
+            {/* Filter Tabs */}
+            <div className="flex items-center gap-2 border-b border-brand-sand/70 pb-3">
+              <button
+                onClick={() => setFilter("ALL")}
+                className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                  filter === "ALL"
+                    ? "bg-brand-emerald text-white shadow-xs"
+                    : "bg-white text-brand-charcoal/70 hover:bg-brand-sand border border-brand-sand"
+                }`}
+              >
+                All Orders ({orders.length})
+              </button>
+              <button
+                onClick={() => setFilter("ACTIVE")}
+                className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                  filter === "ACTIVE"
+                    ? "bg-brand-emerald text-white shadow-xs"
+                    : "bg-white text-brand-charcoal/70 hover:bg-brand-sand border border-brand-sand"
+                }`}
+              >
+                In Discussion / Production (
+                {orders.filter((o) => o.status !== "DELIVERED" && o.status !== "CANCELLED").length})
+              </button>
+              <button
+                onClick={() => setFilter("DELIVERED")}
+                className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                  filter === "DELIVERED"
+                    ? "bg-brand-emerald text-white shadow-xs"
+                    : "bg-white text-brand-charcoal/70 hover:bg-brand-sand border border-brand-sand"
+                }`}
+              >
+                Delivered ({orders.filter((o) => o.status === "DELIVERED").length})
+              </button>
+            </div>
+
+            {/* Orders List */}
+            {loading ? (
+              <div className="p-12 text-center bg-white rounded-3xl border border-brand-sand space-y-3">
+                <div className="w-8 h-8 border-2 border-brand-gold border-t-transparent rounded-full animate-spin mx-auto" />
+                <p className="text-xs font-bold text-brand-charcoal/60">Loading your bespoke creations...</p>
+              </div>
+            ) : filteredOrders.length === 0 ? (
+              <div className="p-12 text-center bg-white rounded-3xl border border-brand-sand space-y-4">
+                <div className="w-16 h-16 rounded-full bg-brand-sand flex items-center justify-center text-brand-emerald mx-auto">
+                  <ShoppingBag className="w-8 h-8 text-brand-teal" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="font-serif text-lg font-bold text-brand-emerald">No orders found</h3>
+                  <p className="text-xs text-brand-charcoal/70 max-w-sm mx-auto">
+                    Looking for an order placed as a guest? Enter your Order Reference number above to track it instantly.
+                  </p>
+                </div>
+                <Link
+                  href="/customize"
+                  className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-full bg-brand-emerald text-white text-xs font-bold hover:bg-brand-teal transition-colors shadow-sm"
+                >
+                  <Sparkles className="w-4 h-4 text-brand-gold" />
+                  <span>Explore 2D Customizer Studio</span>
+                </Link>
+              </div>
+            ) : (
           <div className="space-y-6">
             {filteredOrders.map((order) => (
               <div
@@ -377,6 +476,16 @@ export default function CustomerOrdersPage() {
                   ))}
                 </div>
 
+                {/* Status Note from Artisan */}
+                {order.statusLabel && (
+                  <div className="p-3 rounded-2xl bg-brand-sand/40 border border-brand-sand flex items-center gap-2 text-xs">
+                    <Sparkles className="w-4 h-4 text-brand-gold shrink-0" />
+                    <span className="text-brand-charcoal font-medium">
+                      Status: <strong>{order.statusLabel}</strong>
+                    </span>
+                  </div>
+                )}
+
                 {/* Target Delivery Date if requested */}
                 {order.neededByDate && (
                   <div className="p-3 rounded-2xl bg-amber-50/80 border border-amber-200 flex items-center justify-between text-xs gap-2">
@@ -446,6 +555,8 @@ export default function CustomerOrdersPage() {
               </div>
             ))}
           </div>
+        )}
+          </>
         )}
       </main>
 

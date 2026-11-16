@@ -35,30 +35,30 @@ export default function CheckoutPage() {
   const [neededByDate, setNeededByDate] = useState("");
   const [neededByReason, setNeededByReason] = useState("");
 
-  // Form State - Prepopulated from authenticated user session
+  // Form State - Prepopulated from authenticated user session ONLY (Zero data leakage to guests or other users)
   const [contact, setContact] = useState({
-    fullName: user?.name || "Priya Sharma",
-    phone: (user?.phone ? user.phone.replace(/\D/g, "").slice(-10) : "") || "9876543210",
-    email: user?.email || "priya.sharma@example.com",
+    fullName: user?.name || "",
+    phone: user?.phone ? user.phone.replace(/\D/g, "").slice(-10) : "",
+    email: user?.email || "",
   });
 
   // Sync contact details if authenticated user loads asynchronously
   React.useEffect(() => {
     if (user) {
       setContact((prev) => ({
-        fullName: user.name || prev.fullName,
-        phone: (user.phone ? user.phone.replace(/\D/g, "").slice(-10) : "") || prev.phone,
-        email: user.email || prev.email,
+        fullName: prev.fullName || user.name || "",
+        phone: prev.phone || (user.phone ? user.phone.replace(/\D/g, "").slice(-10) : ""),
+        email: prev.email || user.email || "",
       }));
     }
   }, [user]);
 
   const [shipping, setShipping] = useState({
-    street: "Flat 402, Nilgiri Heights, Baner Road",
-    landmark: "Near Orchid School",
-    city: "Pune",
-    state: "Maharashtra",
-    pincode: "411045",
+    street: "",
+    landmark: "",
+    city: "",
+    state: "",
+    pincode: "",
   });
 
   const [isBillingSame, setIsBillingSame] = useState(true);
@@ -92,7 +92,46 @@ export default function CheckoutPage() {
     }
   };
 
+  const validateStep1 = (): boolean => {
+    setErrorMessage(null);
+    if (!contact.fullName.trim()) {
+      setErrorMessage("Please enter your full name.");
+      return false;
+    }
+    const cleanPhone = contact.phone.replace(/\D/g, "");
+    if (cleanPhone.length < 10) {
+      setErrorMessage("Please enter a valid 10-digit mobile number for WhatsApp design discussion.");
+      return false;
+    }
+    if (!shipping.street.trim()) {
+      setErrorMessage("Please enter your street address & house/flat number.");
+      return false;
+    }
+    const cleanPincode = shipping.pincode.replace(/\D/g, "");
+    if (cleanPincode.length !== 6) {
+      setErrorMessage("Please enter a valid 6-digit Indian postal PIN code.");
+      return false;
+    }
+    if (!shipping.city.trim()) {
+      setErrorMessage("Please enter your city.");
+      return false;
+    }
+    if (!shipping.state.trim()) {
+      setErrorMessage("Please enter your state.");
+      return false;
+    }
+    if (hasNeededByDate && !neededByDate) {
+      setErrorMessage("Please select your target date needed.");
+      return false;
+    }
+    return true;
+  };
+
   const handlePlaceOrder = async () => {
+    if (!validateStep1()) {
+      setStep(1);
+      return;
+    }
     setIsSubmitting(true);
     setErrorMessage(null);
 
@@ -189,7 +228,9 @@ export default function CheckoutPage() {
             1. Shipping &amp; Contact
           </div>
           <div
-            onClick={() => setStep(2)}
+            onClick={() => {
+              if (validateStep1()) setStep(2);
+            }}
             className={`cursor-pointer p-2 sm:p-3 rounded-xl sm:rounded-2xl border transition-all ${step === 2
                 ? "bg-brand-emerald text-white border-brand-emerald shadow-sm"
                 : "bg-white text-slate-500 border-brand-sand"
@@ -198,7 +239,9 @@ export default function CheckoutPage() {
             2. Billing Address
           </div>
           <div
-            onClick={() => setStep(3)}
+            onClick={() => {
+              if (validateStep1()) setStep(3);
+            }}
             className={`cursor-pointer p-2 sm:p-3 rounded-xl sm:rounded-2xl border transition-all ${step === 3
                 ? "bg-brand-emerald text-white border-brand-emerald shadow-sm"
                 : "bg-white text-slate-500 border-brand-sand"
@@ -397,7 +440,9 @@ export default function CheckoutPage() {
 
                 <div className="pt-4 flex justify-end">
                   <button
-                    onClick={() => setStep(2)}
+                    onClick={() => {
+                      if (validateStep1()) setStep(2);
+                    }}
                     className="px-8 py-3 rounded-full bg-brand-emerald text-white font-bold text-sm hover:bg-brand-teal transition-all"
                   >
                     Continue to Billing ➔

@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Printer, ArrowLeft, Lock, Sparkles } from "lucide-react";
+import { Printer, ArrowLeft, Lock, Sparkles, FileText, AlertCircle } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 
 interface InvoicePageProps {
@@ -13,78 +13,118 @@ interface InvoicePageProps {
 
 export default function OrderReceiptPage({ params }: InvoicePageProps) {
   const { id } = params;
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, openAuthModal } = useAuthStore();
+  const [receipt, setReceipt] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const isAuthorized =
-    isAuthenticated &&
-    (user?.role === "ARTISAN_ADMIN" || user?.name?.toLowerCase().includes("priya"));
+  useEffect(() => {
+    async function fetchReceipt() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`/api/invoices/${id}`, { cache: "no-store" });
+        const data = await res.json();
+        if (data.success && data.receipt) {
+          setReceipt(data.receipt);
+        } else {
+          setError(data.error || "Order receipt could not be found.");
+        }
+      } catch (err: any) {
+        console.error("Failed to load invoice receipt:", err);
+        setError("Network error while loading order receipt.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchReceipt();
+  }, [id, user]);
 
-  // Order Receipt Data Model (with dynamic privacy masking)
-  const receipt = {
-    receiptNumber: id.startsWith("INV-") ? id.replace("INV-", "REC-") : id,
-    date: "29-Oct-2026",
-    orderNumber: "ART-2026-1049",
-    seller: {
-      brandName: "Artआलय Artisanal Works",
-      address: "Survey No. 42, Artisan Studio Park, Baner, Pune, Maharashtra - 411045",
-      email: "care@artaalay.com",
-      whatsapp: "+91 93735 67492",
-    },
-    buyer: {
-      name: isAuthorized ? "Priya Sharma" : "Priya S***** [Masked for Privacy]",
-      address: isAuthorized
-        ? "Flat 402, Nilgiri Heights, Baner Road, Pune, Maharashtra - 411045"
-        : "Baner Road, Pune, Maharashtra - 411045 [Street Address Protected]",
-      phone: isAuthorized ? "+91 9876543210" : "+91 98••••••10",
-      city: "Pune, Maharashtra",
-    },
-    items: [
-      {
-        id: 1,
-        description: "Bespoke Natural Wood & Ocean Resin Nameplate (16\"x10\")",
-        craftDetails: "Hand-poured resin waves, 24K gold foil flakes, 3D laser-cut mirror gold lettering",
-        quantity: 1,
-        unitPrice: 2499.0,
-        total: 2499.0,
-      },
-    ],
-    summary: {
-      subtotal: 2499.0,
-      shippingFee: 0.0,
-      grandTotal: 2499.0,
-      amountInWords: "Two Thousand Four Hundred and Ninety-Nine Rupees Only",
-      paymentMethod: "Offline Settlement (Cash / Direct UPI on Delivery)",
-      paymentStatus: "Pending Offline Settlement",
-    },
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center space-y-4 shadow-xl">
+          <div className="w-12 h-12 rounded-full border-4 border-brand-emerald border-t-transparent animate-spin mx-auto" />
+          <h3 className="font-serif text-lg font-bold text-brand-emerald">
+            Loading Electronic Receipt...
+          </h3>
+          <p className="text-xs text-slate-500">
+            Fetching verified studio order records for #{id}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !receipt) {
+    return (
+      <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center space-y-4 shadow-xl border border-slate-200">
+          <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto">
+            <AlertCircle className="w-6 h-6" />
+          </div>
+          <h3 className="font-serif text-lg font-bold text-slate-800">
+            Receipt Not Found
+          </h3>
+          <p className="text-xs text-slate-600">
+            {error || `No order receipt found for reference "${id}".`}
+          </p>
+          <div className="pt-2 flex justify-center gap-3">
+            <Link
+              href="/"
+              className="px-5 py-2.5 rounded-full bg-brand-emerald text-white text-xs font-bold hover:bg-brand-teal transition-all"
+            >
+              Back to Storefront
+            </Link>
+            <Link
+              href="/account/orders"
+              className="px-5 py-2.5 rounded-full border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-50 transition-all"
+            >
+              My Orders
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-100 p-4 sm:p-8 font-sans print:p-0 print:bg-white text-black">
       {/* Top Action Header */}
       <div className="max-w-4xl mx-auto mb-6 flex items-center justify-between print:hidden">
         <Link
-          href="/"
+          href="/account/orders"
           className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-black"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to Storefront</span>
+          <span>Back to My Orders</span>
         </Link>
 
         <button
           onClick={() => window.print()}
-          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-brand-emerald text-white text-xs font-bold shadow hover:bg-brand-teal transition-all"
+          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-brand-emerald text-white text-xs font-bold shadow hover:bg-brand-teal transition-all cursor-pointer"
         >
           <Printer className="w-4 h-4 text-brand-gold" />
           <span>Print / Save Order Receipt (PDF)</span>
         </button>
       </div>
 
-      {!isAuthorized && (
-        <div className="max-w-4xl mx-auto mb-4 p-3 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-2.5 text-xs text-amber-900 print:hidden">
-          <Lock className="w-4 h-4 text-amber-600 shrink-0" />
-          <span>
-            <strong>Privacy Protection Active:</strong> Customer personal details (full street address &amp; phone number) are masked for unauthenticated viewers. Sign in as an administrator or the verified purchaser to view unmasked details.
-          </span>
+      {receipt.isMasked && (
+        <div className="max-w-4xl mx-auto mb-4 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-amber-900 print:hidden">
+          <div className="flex items-center gap-2.5">
+            <Lock className="w-4 h-4 text-amber-600 shrink-0" />
+            <span>
+              <strong>Privacy Protection Active:</strong> Customer personal details (full street address &amp; phone number) are masked for unauthenticated viewers. Sign in as an administrator or the verified purchaser to view unmasked details.
+            </span>
+          </div>
+          {!isAuthenticated && (
+            <button
+              onClick={() => openAuthModal("LOGIN")}
+              className="px-4 py-1.5 rounded-full bg-amber-600 text-white font-bold text-xs hover:bg-amber-700 shrink-0 cursor-pointer"
+            >
+              Sign In to Verify
+            </button>
+          )}
         </div>
       )}
 
@@ -122,13 +162,15 @@ export default function OrderReceiptPage({ params }: InvoicePageProps) {
           <div>
             <span className="text-[10px] font-mono uppercase text-slate-500 block">Customer Details:</span>
             <p className="font-bold text-sm mt-0.5">{receipt.buyer.name}</p>
-            <p className="text-slate-600 mt-0.5">{receipt.buyer.address}</p>
+            <p className="text-slate-600 mt-0.5">{receipt.buyer.street}</p>
+            <p className="text-slate-600">{receipt.buyer.city}, {receipt.buyer.state} - {receipt.buyer.pincode}</p>
             <p className="mt-1">Phone: {receipt.buyer.phone}</p>
           </div>
           <div>
             <span className="text-[10px] font-mono uppercase text-slate-500 block">Delivery Destination:</span>
             <p className="font-bold text-sm mt-0.5">{receipt.buyer.name}</p>
-            <p className="text-slate-600 mt-0.5">{receipt.buyer.address}</p>
+            <p className="text-slate-600 mt-0.5">{receipt.buyer.street}</p>
+            <p className="text-slate-600">{receipt.buyer.city}, {receipt.buyer.state} - {receipt.buyer.pincode}</p>
             <p className="mt-1">Air Express Courier Handover</p>
           </div>
         </div>
@@ -146,8 +188,8 @@ export default function OrderReceiptPage({ params }: InvoicePageProps) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
-              {receipt.items.map((item, idx) => (
-                <tr key={item.id}>
+              {receipt.items.map((item: any, idx: number) => (
+                <tr key={idx}>
                   <td className="p-2.5 border-r border-black text-center font-mono">{idx + 1}</td>
                   <td className="p-2.5 border-r border-black">
                     <p className="font-bold text-sm">{item.description}</p>
@@ -155,10 +197,10 @@ export default function OrderReceiptPage({ params }: InvoicePageProps) {
                   </td>
                   <td className="p-2.5 border-r border-black text-center font-bold">{item.quantity}</td>
                   <td className="p-2.5 border-r border-black text-right font-mono">
-                    ₹{item.unitPrice.toFixed(2)}
+                    ₹{Number(item.unitPrice).toFixed(2)}
                   </td>
                   <td className="p-2.5 text-right font-bold font-mono">
-                    ₹{item.total.toFixed(2)}
+                    ₹{Number(item.total).toFixed(2)}
                   </td>
                 </tr>
               ))}
@@ -169,10 +211,7 @@ export default function OrderReceiptPage({ params }: InvoicePageProps) {
         {/* Financial Calculation Totals */}
         <div className="grid grid-cols-2 gap-6 text-xs pt-2 pb-6 border-b border-black">
           <div>
-            <p className="font-bold text-[11px] uppercase text-slate-700">Total in Words:</p>
-            <p className="font-serif italic font-bold mt-1 text-slate-900">{receipt.summary.amountInWords}</p>
-
-            <div className="mt-4 p-3 bg-slate-50 border border-slate-300 rounded space-y-1 text-[11px]">
+            <div className="mt-2 p-3 bg-slate-50 border border-slate-300 rounded space-y-1 text-[11px]">
               <p><strong>Payment Gateway:</strong> {receipt.summary.paymentMethod}</p>
               <p><strong>Transaction Status:</strong> {receipt.summary.paymentStatus}</p>
               <p className="text-slate-500 text-[10px] pt-1 border-t border-slate-200 mt-1">
@@ -184,19 +223,27 @@ export default function OrderReceiptPage({ params }: InvoicePageProps) {
           <div className="space-y-1.5 font-mono text-right">
             <div className="flex justify-between">
               <span>Item Subtotal:</span>
-              <span>₹{receipt.summary.subtotal.toFixed(2)}</span>
+              <span>₹{Number(receipt.summary.subtotal).toFixed(2)}</span>
             </div>
+            {receipt.summary.discount > 0 && (
+              <div className="flex justify-between text-emerald-700">
+                <span>Discount Applied:</span>
+                <span>-₹{Number(receipt.summary.discount).toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span>Studio Packaging &amp; Preparation:</span>
               <span className="text-emerald-700 font-semibold">Included</span>
             </div>
             <div className="flex justify-between">
               <span>Shipping &amp; Courier Handover:</span>
-              <span className="text-emerald-700 font-semibold">FREE</span>
+              <span className="text-emerald-700 font-semibold">
+                {receipt.summary.shippingFee > 0 ? `₹${Number(receipt.summary.shippingFee).toFixed(2)}` : "FREE"}
+              </span>
             </div>
             <div className="flex justify-between text-base font-extrabold font-serif pt-3 border-t border-black text-black">
               <span>Grand Total:</span>
-              <span>₹{receipt.summary.grandTotal.toFixed(2)}</span>
+              <span>₹{Number(receipt.summary.grandTotal).toFixed(2)}</span>
             </div>
           </div>
         </div>

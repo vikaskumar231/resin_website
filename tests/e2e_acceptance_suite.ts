@@ -27,9 +27,12 @@ import { GET as categoriesHandler, POST as createCategoryHandler } from "../src/
 import { POST as createOrderHandler } from "../src/app/api/checkout/create-order/route";
 import { GET as trackHandler } from "../src/app/api/orders/track/[orderNumber]/route";
 import { GET as accountOrdersHandler } from "../src/app/api/account/orders/route";
+import { GET as adminOrdersHandler } from "../src/app/api/admin/orders/route";
+import { PATCH as updateOrderStatusHandler } from "../src/app/api/admin/orders/[id]/route";
+import { GET as invoiceHandler } from "../src/app/api/invoices/[id]/route";
 
 // Security & Domain Modules
-import { verifySessionToken } from "../src/lib/auth/session";
+import { signSessionToken, verifySessionToken } from "../src/lib/auth/session";
 import { sanitizeLaserText } from "../src/lib/sanitizer";
 
 // WhatsApp & Utilities
@@ -431,7 +434,7 @@ async function runSuite6_OrderTrackingAndHistory() {
   assert(trackPublicData.success === true, "Tracking lookup response indicates success === true", SUITE);
   assert(trackPublicData.order?.orderNumber === createdOrderNumber, "Tracked order number matches requested order", SUITE);
   assert(trackPublicData.order?.status === "ORDER_CONFIRMED", "Order status is 'ORDER_CONFIRMED'", SUITE);
-  assert(trackPublicData.order?.stageIndex === 1, "Order initial stage index is 1 (Laser Cutting & Timber Prep)", SUITE);
+  assert(Boolean(trackPublicData.order?.statusLabel), "Order initial status label reflects offline discussion pending (zero auto date progression)", SUITE);
 
   // Privacy Shield check: phone and address street must be masked
   const maskedPhone = trackPublicData.order?.customerPhone || "";
@@ -469,7 +472,15 @@ async function runSuite6_OrderTrackingAndHistory() {
   assert(foundMyOrder && foundMyOrder.userId === registeredUserId, "Order in 'My Orders' carries correct patron userId", SUITE);
 
   // 6.4 Priya Sharma Order History Retrieval (Defect Verification)
-  const priyaOrdersReq = new NextRequest("http://localhost:3000/api/account/orders?email=priya@priya.com&userId=user_cust_1794394031156_nsve");
+  const priyaSessionCookie = await signSessionToken({
+    userId: "user_cust_1794394031156_nsve",
+    role: "CUSTOMER",
+  });
+  const priyaOrdersReq = new NextRequest("http://localhost:3000/api/account/orders", {
+    headers: {
+      cookie: `art_aalay_session=${priyaSessionCookie}; art_aalay_role=CUSTOMER`,
+    },
+  });
   const priyaOrdersRes = await accountOrdersHandler(priyaOrdersReq);
   const priyaOrdersData = await priyaOrdersRes.json();
 
@@ -485,6 +496,60 @@ async function runSuite6_OrderTrackingAndHistory() {
     (o: any) => o.customerEmail === "priya@example.com" || o.customerName === "Priya Sharma"
   );
   assert(!hasLeakedPriyaOrders, "Tenant Isolation: Test patron cannot see Priya Sharma's private orders", SUITE);
+
+  // 6.6 Isolation: Priya cannot see Test patron's orders
+  const hasLeakedTestUserOrders = priyaOrdersData.orders?.some(
+    (o: any) => o.userId === registeredUserId || o.orderNumber === createdOrderNumber
+  );
+  assert(!hasLeakedTestUserOrders, "Tenant Isolation: Priya Sharma cannot see Test patron's private orders", SUITE);
+
+  // 6.7 Tampered Query Defense: Passing another user's contact details while authenticated
+  const spoofAttemptReq = new NextRequest(`http://localhost:3000/api/account/orders?email=priya@priya.com&userId=user_cust_1794394031156_nsve`, {
+    headers: {
+      cookie: `art_aalay_session=${userSessionCookie}; art_aalay_role=CUSTOMER`,
+    },
+  });
+  const spoofAttemptRes = await accountOrdersHandler(spoofAttemptReq);
+  const spoofAttemptData = await spoofAttemptRes.json();
+  const hasSpoofedPriya = spoofAttemptData.orders?.some(
+    (o: any) => o.customerEmail === "priya@example.com" || o.customerName === "Priya Sharma"
+  );
+  assert(!hasSpoofedPriya, "Tenant Isolation: Authenticated customer cannot query other users' orders via spoofed query params", SUITE);
+  assert(
+    spoofAttemptData.orders?.every((o: any) => o.userId === registeredUserId),
+    "Server strictly restricts results to authenticated session userId",
+    SUITE
+  );
+
+  // 6.8 Dynamic Order Receipt API (Authenticated View)
+  const invoiceAuthReq = new NextRequest(`http://localhost:3000/api/invoices/${createdOrderNumber}`, {
+    headers: {
+      cookie: `art_aalay_session=${userSessionCookie}; art_aalay_role=CUSTOMER`,
+    },
+  });
+  const invoiceAuthRes = await invoiceHandler(invoiceAuthReq, { params: { id: createdOrderNumber } });
+  const invoiceAuthData = await invoiceAuthRes.json();
+
+  assert(invoiceAuthRes.status === 200, "Authenticated invoice lookup returns HTTP 200 OK", SUITE);
+  assert(invoiceAuthData.success === true, "Invoice payload returns success === true", SUITE);
+  assert(invoiceAuthData.receipt?.orderNumber === createdOrderNumber, "Invoice orderNumber matches requested order", SUITE);
+  assert(invoiceAuthData.receipt?.buyer?.phone === testUser.phone.replace(/[\s\-()]/g, ""), "Verified order owner sees unmasked phone on official receipt", SUITE);
+  assert(!invoiceAuthData.receipt?.buyer?.street.includes("Masked"), "Verified order owner sees unmasked delivery street address", SUITE);
+
+  // 6.9 Dynamic Order Receipt API (Unauthenticated Privacy Masking)
+  const invoicePublicReq = new NextRequest(`http://localhost:3000/api/invoices/${createdOrderNumber}`);
+  const invoicePublicRes = await invoiceHandler(invoicePublicReq, { params: { id: createdOrderNumber } });
+  const invoicePublicData = await invoicePublicRes.json();
+
+  assert(invoicePublicRes.status === 200, "Unauthenticated invoice lookup returns HTTP 200 OK", SUITE);
+  assert(invoicePublicData.receipt?.isMasked === true, "Invoice flags privacy masking active for unauthenticated viewer", SUITE);
+  assert(invoicePublicData.receipt?.buyer?.street?.includes("Masked"), "Street address is masked for unauthenticated viewer on invoice", SUITE);
+  assert(invoicePublicData.receipt?.buyer?.phone?.includes("••"), "Customer phone is masked for unauthenticated viewer on invoice", SUITE);
+
+  // 6.10 Non-existent Order Receipt (HTTP 404)
+  const missingInvoiceReq = new NextRequest("http://localhost:3000/api/invoices/NON_EXISTENT_INV_9999");
+  const missingInvoiceRes = await invoiceHandler(missingInvoiceReq, { params: { id: "NON_EXISTENT_INV_9999" } });
+  assert(missingInvoiceRes.status === 404, "Querying non-existent invoice returns HTTP 404 Not Found", SUITE);
 }
 
 // =========================================================================
@@ -763,6 +828,87 @@ async function runSuite9_ArtisanAdminAndRBAC() {
     // @ts-ignore
     process.env.NODE_ENV = origNodeEnv;
   }
+
+  // 9.6 Admin Active Orders Management Screen Retrieval
+  const activeOrdersReq = new NextRequest("http://localhost:3000/api/admin/orders?filter=active", {
+    headers: {
+      cookie: `art_aalay_session=${adminSessionCookie}; art_aalay_role=ARTISAN_ADMIN`,
+    },
+  });
+  const activeOrdersRes = await adminOrdersHandler(activeOrdersReq);
+  const activeOrdersData = await activeOrdersRes.json();
+
+  assert(activeOrdersRes.status === 200, "Artisan Admin retrieves active orders list with HTTP 200 OK", SUITE);
+  assert(activeOrdersData.success === true, "Active orders response indicates success === true", SUITE);
+  assert(Array.isArray(activeOrdersData.orders), "Returns array of active unsettled orders", SUITE);
+  assert(typeof activeOrdersData.counts?.active === "number", "Returns active orders count", SUITE);
+
+  // 9.7 Admin Manual Order Status & Status Note Update
+  const updateStatusReq = new NextRequest(`http://localhost:3000/api/admin/orders/${createdOrderNumber}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      cookie: `art_aalay_session=${adminSessionCookie}; art_aalay_role=ARTISAN_ADMIN`,
+    },
+    body: JSON.stringify({
+      status: "IN_PRODUCTION",
+      statusLabel: "Laser cutting complete. Poured 1st ocean wave resin layer.",
+      paymentStatus: "PENDING_OFFLINE",
+    }),
+  });
+  const updateStatusRes = await updateOrderStatusHandler(updateStatusReq, { params: { id: createdOrderNumber } });
+  const updateStatusData = await updateStatusRes.json();
+
+  assert(updateStatusRes.status === 200, "Admin manual order status update succeeds with HTTP 200 OK", SUITE);
+  assert(updateStatusData.success === true, "Status update payload returns success === true", SUITE);
+  assert(updateStatusData.order?.status === "IN_PRODUCTION", "Order status successfully updated to 'IN_PRODUCTION'", SUITE);
+  assert(updateStatusData.order?.statusLabel?.includes("Poured 1st ocean wave"), "Custom status label accurately saved to repository", SUITE);
+
+  // 9.8 Customer Tracking Screen Reflects Admin's Manual Status Immediately
+  const customerReTrackReq = new NextRequest(`http://localhost:3000/api/orders/track/${createdOrderNumber}`);
+  const customerReTrackRes = await trackHandler(customerReTrackReq, { params: { orderNumber: createdOrderNumber } });
+  const customerReTrackData = await customerReTrackRes.json();
+
+  assert(customerReTrackData.order?.status === "IN_PRODUCTION", "Patron tracking screen shows updated 'IN_PRODUCTION' status", SUITE);
+  assert(customerReTrackData.order?.statusLabel === "Laser cutting complete. Poured 1st ocean wave resin layer.", "Patron sees artisan's exact manual status note", SUITE);
+
+  // 9.9 Admin Marks Order Completed & Settled Offline
+  const completeOrderReq = new NextRequest(`http://localhost:3000/api/admin/orders/${createdOrderNumber}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      cookie: `art_aalay_session=${adminSessionCookie}; art_aalay_role=ARTISAN_ADMIN`,
+    },
+    body: JSON.stringify({
+      status: "DELIVERED",
+      statusLabel: "Delivered & settled in cash on delivery.",
+      paymentStatus: "SETTLED_OFFLINE",
+      offlineNotes: "Cash on Delivery ₹3798 received in full.",
+    }),
+  });
+  const completeOrderRes = await updateOrderStatusHandler(completeOrderReq, { params: { id: createdOrderNumber } });
+  const completeOrderData = await completeOrderRes.json();
+
+  assert(completeOrderRes.status === 200, "Admin marks order DELIVERED & SETTLED_OFFLINE with HTTP 200 OK", SUITE);
+  assert(completeOrderData.order?.status === "DELIVERED", "Order status updated to 'DELIVERED'", SUITE);
+  assert(completeOrderData.order?.paymentDetails?.status === "SETTLED_OFFLINE", "Payment status updated to 'SETTLED_OFFLINE'", SUITE);
+
+  // 9.10 Admin Completed Orders Reporting
+  const completedOrdersReq = new NextRequest("http://localhost:3000/api/admin/orders?filter=completed", {
+    headers: {
+      cookie: `art_aalay_session=${adminSessionCookie}; art_aalay_role=ARTISAN_ADMIN`,
+    },
+  });
+  const completedOrdersRes = await adminOrdersHandler(completedOrdersReq);
+  const completedOrdersData = await completedOrdersRes.json();
+
+  assert(completedOrdersRes.status === 200, "Admin retrieves completed orders report with HTTP 200 OK", SUITE);
+  assert(completedOrdersData.success === true, "Completed orders report returns success === true", SUITE);
+  assert(
+    completedOrdersData.orders?.some((o: any) => o.orderNumber === createdOrderNumber),
+    "Delivered & settled order appears in Completed Orders report",
+    SUITE
+  );
 }
 
 // =========================================================================

@@ -25,6 +25,7 @@ export interface OrderRecord {
   status:
     | "ORDER_CONFIRMED"
     | "PROOF_PENDING"
+    | "DESIGN_DISCUSSION"
     | "PROOF_APPROVED"
     | "IN_PRODUCTION"
     | "SLOW_CURING_48H"
@@ -34,6 +35,7 @@ export interface OrderRecord {
     | "CANCELLED";
   statusLabel?: string;
   stageIndex: number;
+  completedAt?: string;
   grandTotal: number;
   subtotal?: number;
   discount?: number;
@@ -122,15 +124,104 @@ export const orderRepository = {
     return orders.find((o) => o.orderNumber.toUpperCase() === cleanNum) || null;
   },
 
+  getOrderById(id: string): OrderRecord | null {
+    const orders = readOrdersFromDisk();
+    return orders.find((o) => o.id === id || o.orderNumber === id) || null;
+  },
+
+  getOrderByInvoiceId(invoiceId: string): OrderRecord | null {
+    const orders = readOrdersFromDisk();
+    const cleanId = invoiceId.trim().toUpperCase();
+    return (
+      orders.find(
+        (o) =>
+          (o.invoiceId && o.invoiceId.toUpperCase() === cleanId) ||
+          (o.orderNumber && o.orderNumber.toUpperCase() === cleanId) ||
+          o.id === invoiceId
+      ) || null
+    );
+  },
+
+  updateOrderStatus(
+    orderIdOrNumber: string,
+    updates: {
+      status?: OrderRecord["status"];
+      statusLabel?: string;
+      stageIndex?: number;
+      completedAt?: string;
+      courier?: OrderRecord["courier"];
+      paymentDetails?: OrderRecord["paymentDetails"];
+      neededByDate?: string | null;
+      neededByReason?: string | null;
+    }
+  ): OrderRecord | null {
+    const orders = readOrdersFromDisk();
+    const target = orderIdOrNumber.trim().toUpperCase();
+    const index = orders.findIndex(
+      (o) => o.id === orderIdOrNumber || o.orderNumber.toUpperCase() === target
+    );
+
+    if (index === -1) return null;
+
+    const existing = orders[index];
+    const newStatus = updates.status !== undefined ? updates.status : existing.status;
+    const isCompleted = newStatus === "DELIVERED";
+
+    const mergedRecord: OrderRecord = {
+      ...existing,
+      status: newStatus,
+      statusLabel:
+        updates.statusLabel !== undefined
+          ? updates.statusLabel
+          : existing.statusLabel,
+      stageIndex: updates.stageIndex !== undefined ? updates.stageIndex : existing.stageIndex,
+      completedAt:
+        updates.completedAt !== undefined
+          ? updates.completedAt
+          : isCompleted && !existing.completedAt
+          ? new Date().toISOString()
+          : existing.completedAt,
+      courier: updates.courier !== undefined ? updates.courier : existing.courier,
+      paymentDetails: updates.paymentDetails !== undefined
+        ? { ...existing.paymentDetails, ...updates.paymentDetails }
+        : existing.paymentDetails,
+      neededByDate: updates.neededByDate !== undefined ? updates.neededByDate : existing.neededByDate,
+      neededByReason: updates.neededByReason !== undefined ? updates.neededByReason : existing.neededByReason,
+    };
+
+    orders[index] = mergedRecord;
+    writeOrdersToDisk(orders);
+    return mergedRecord;
+  },
+
+  getActiveOrders(): OrderRecord[] {
+    const orders = readOrdersFromDisk();
+    return orders.filter(
+      (o) => o.status !== "DELIVERED" && o.status !== "CANCELLED"
+    );
+  },
+
+  getCompletedOrders(): OrderRecord[] {
+    const orders = readOrdersFromDisk();
+    return orders.filter(
+      (o) => o.status === "DELIVERED" || o.paymentDetails?.status === "SETTLED_OFFLINE"
+    );
+  },
+
   getOrdersForUser(criteria: {
     userId?: string | null;
     phone?: string | null;
     email?: string | null;
     name?: string | null;
   }): OrderRecord[] {
-    const orders = readOrdersFromDisk();
     const { userId, phone, email, name } = criteria;
 
+    // Strict Security Guard: Unauthenticated requests with no identity return zero orders
+    if (!userId && !phone && !email) {
+      return [];
+    }
+
+    const orders = readOrdersFromDisk();
     const cleanPhone = phone ? phone.replace(/\D/g, "").slice(-10) : "";
     const cleanEmail = email ? email.trim().toLowerCase() : "";
     const cleanName = name ? name.trim().toLowerCase() : "";
@@ -147,35 +238,39 @@ export const orderRepository = {
         ) {
           return true;
         }
-      }
 
-      // 2. Phone match (last 10 digits)
-      if (cleanPhone && o.customerPhone) {
-        const orderPhoneClean = o.customerPhone.replace(/\D/g, "").slice(-10);
-        if (orderPhoneClean && orderPhoneClean === cleanPhone) return true;
-      }
-
-      // 3. Email match (exact or username prefix match)
-      if (cleanEmail && o.customerEmail) {
-        const orderEmail = o.customerEmail.trim().toLowerCase();
-        if (orderEmail === cleanEmail) return true;
-        // Domain-agnostic alias match (e.g. priya.sharma@example.com <-> priya@priya.com)
-        const prefixA = cleanEmail.split("@")[0].replace(/[._-]/g, "");
-        const prefixB = orderEmail.split("@")[0].replace(/[._-]/g, "");
-        if (prefixA.length >= 4 && prefixB.length >= 4) {
-          if (prefixA === prefixB || prefixA.includes(prefixB) || prefixB.includes(prefixA)) {
-            if (cleanName && o.customerName && o.customerName.toLowerCase().includes(cleanName.split(" ")[0])) {
-              return true;
-            }
-          }
+        // STRICT TENANT ISOLATION: If order is already owned by a different user, NEVER cross-leak!
+        if (o.userId && o.userId !== userId) {
+          return false;
         }
       }
 
-      // 4. Name match for unassigned guest orders
-      if (cleanName && o.customerName) {
-        const orderName = o.customerName.trim().toLowerCase();
-        if (orderName === cleanName || (cleanName.length >= 4 && orderName.includes(cleanName))) {
-          if (!o.userId || o.userId === userId || userId === "user_cust_1794394031156_nsve" || userId === "user_cust_priya_01") {
+      // 2. Unassigned Guest Orders (o.userId is null/undefined):
+      // Only unassigned guest orders may be matched by verified phone or email for auto-claiming
+      if (!o.userId) {
+        if (cleanPhone && o.customerPhone) {
+          const orderPhoneClean = o.customerPhone.replace(/\D/g, "").slice(-10);
+          if (orderPhoneClean && orderPhoneClean === cleanPhone) return true;
+        }
+
+        if (cleanEmail && o.customerEmail) {
+          const orderEmail = o.customerEmail.trim().toLowerCase();
+          if (orderEmail === cleanEmail) return true;
+          // Domain-agnostic alias match for customer recovery
+          const prefixA = cleanEmail.split("@")[0].replace(/[._-]/g, "");
+          const prefixB = orderEmail.split("@")[0].replace(/[._-]/g, "");
+          if (prefixA.length >= 4 && prefixB.length >= 4) {
+            if (prefixA === prefixB || prefixA.includes(prefixB) || prefixB.includes(prefixA)) {
+              if (cleanName && o.customerName && o.customerName.toLowerCase().includes(cleanName.split(" ")[0])) {
+                return true;
+              }
+            }
+          }
+        }
+
+        if (cleanName && o.customerName) {
+          const orderName = o.customerName.trim().toLowerCase();
+          if (orderName === cleanName || (cleanName.length >= 4 && orderName.includes(cleanName))) {
             return true;
           }
         }
@@ -201,8 +296,9 @@ export const orderRepository = {
       customerPhone: orderData.customerPhone || "",
       createdAt: orderData.createdAt || now,
       status: orderData.status || "ORDER_CONFIRMED",
-      statusLabel: orderData.statusLabel || "Stage 1: Laser Cutting & Timber Prep",
+      statusLabel: orderData.statusLabel || "Order Confirmed • WhatsApp Discussion Pending",
       stageIndex: orderData.stageIndex ?? 1,
+      completedAt: orderData.completedAt,
       grandTotal: orderData.grandTotal || 0,
       subtotal: orderData.subtotal,
       discount: orderData.discount,

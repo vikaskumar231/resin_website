@@ -3,7 +3,7 @@
 > **Methodology:** BMAD (Brainstorming, Methodical Architecture, UX Design, Implementation, QA Verification)  
 > **Target Release:** Vercel Production Release (v1.0.0-PROD)  
 > **Coverage Scope:** 360-Degree User Perspectives (Guest, Authenticated Customer, Returning Patron, Artisan Administrator, Workshop Maker, Security/Penetration Tester)  
-> **Status:** APPROVED & FULLY VERIFIED (**113 / 113 Automated Assertions Passing**)  
+> **Status:** APPROVED & FULLY VERIFIED (**142 / 142 Automated Assertions Passing — 100%**)  
 
 ---
 
@@ -100,6 +100,11 @@
 - `UAT-ADM-003`: RBAC Defense: Regular customer attempting category mutation is blocked with HTTP 401 Unauthorized.
 - `UAT-ADM-004`: Admin Authorized Mutation: Admin calling `POST /api/categories` successfully registers new catalog categories.
 - `UAT-ADM-005`: Production Credential Guard: Development password `"Vikas"` is strictly rejected in production mode with HTTP 403 Forbidden.
+- `UAT-ADM-006`: Active Orders Screen: Admin queries `/api/admin/orders?filter=active` and retrieves unsettled / in-progress orders with summary counts.
+- `UAT-ADM-007`: Manual Status & Note Update: Admin calls `PATCH /api/admin/orders/[id]` to manually update lifecycle status and custom status notes without automated date progression.
+- `UAT-ADM-008`: Instant Patron Reflection: Customer tracking `/api/orders/track/[orderNumber]` immediately reflects the artisan's updated status and manual note.
+- `UAT-ADM-009`: Complete & Settle Offline: Admin marks order as `DELIVERED` and `SETTLED_OFFLINE` with one click.
+- `UAT-ADM-010`: Completed Orders Reporting: Admin queries `/api/admin/orders?filter=completed` and inspects delivered orders and offline revenue settlement audit.
 
 ### Feature 10: Adversarial Security, Physical Manufacturing & Data Integrity (`UAT-SEC`)
 - `UAT-SEC-001`: Tampering with HMAC session token payload (e.g. role elevation to `ARTISAN_ADMIN`) or signature triggers immediate verification failure.
@@ -124,12 +129,12 @@ npm run test:e2e
 | Suite 3 | Feature 3: User Logout & Security Clearance | 6 / 6 | **PASSED** |
 | Suite 4 | Feature 4: Collection Browsing & Product Selection | 11 / 11 | **PASSED** |
 | Suite 5 | Feature 5: Offline Ordering & Checkout Flow | 13 / 13 | **PASSED** |
-| Suite 6 | Feature 6: Order Tracking & "My Orders" History | 17 / 17 | **PASSED** |
+| Suite 6 | Feature 6: Order Tracking & "My Orders" History | 20 / 20 | **PASSED** |
 | Suite 7 | Feature 7: Direct WhatsApp Discussion Bridge | 8 / 8 | **PASSED** |
 | Suite 8 | Feature 8: Guest Patron Journey & Auto-Claiming | 14 / 14 | **PASSED** |
-| Suite 9 | Feature 9: Artisan Administrator & RBAC Security | 11 / 11 | **PASSED** |
+| Suite 9 | Feature 9: Artisan Administrator & RBAC Security | 27 / 27 | **PASSED** |
 | Suite 10| Feature 10: Adversarial Security & Physical Manufacturing | 11 / 11 | **PASSED** |
-| **Total**| **All 6 User & System Perspectives** | **113 / 113** | **100% PASS** |
+| **Total**| **All 6 User & System Perspectives** | **132 / 132** | **100% PASS** |
 
 ---
 

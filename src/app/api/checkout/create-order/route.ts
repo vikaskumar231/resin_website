@@ -170,19 +170,10 @@ export async function POST(req: NextRequest) {
     const randomSuffix = crypto.randomBytes(3).toString("hex").toUpperCase();
     const orderNumber = `ART-${year}-${randomSuffix}`;
 
-    // Extract authenticated user ID from session cookie or body, or match by email/phone
+    // Authoritative Tenant Identification: Verified Session Cookie ONLY (Zero Spoofing via request body or unverified email)
     const sessionCookie = req.cookies.get("art_aalay_session")?.value;
     const session = sessionCookie ? await verifySessionToken(sessionCookie) : null;
-    let resolvedUserId: string | null = body.userId || (session?.valid ? session.userId : null);
-
-    if (!resolvedUserId) {
-      if (customerEmail || cleanPhone) {
-        const matchedUser = await userRepository.findByIdentifier(customerEmail || cleanPhone);
-        if (matchedUser) {
-          resolvedUserId = matchedUser.id;
-        }
-      }
-    }
+    const resolvedUserId: string | null = (session?.valid && session.userId) ? session.userId : null;
 
     // 6. Persist order directly to disk/database repository with OFFLINE_SETTLEMENT status
     try {
@@ -213,7 +204,7 @@ export async function POST(req: NextRequest) {
         neededByDate: neededByDate || null,
         neededByReason: neededByReason || null,
         status: "ORDER_CONFIRMED",
-        statusLabel: "Stage 1: Laser Cutting & Timber Prep",
+        statusLabel: "Order Confirmed • WhatsApp Discussion Pending",
         stageIndex: 1,
         paymentDetails: {
           method: "OFFLINE_SETTLEMENT",

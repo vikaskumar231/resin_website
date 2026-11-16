@@ -22,6 +22,7 @@ import {
   ShoppingBag,
   ExternalLink,
   X,
+  Lock,
 } from "lucide-react";
 
 const SUGGESTED_EMOJIS = [
@@ -32,8 +33,8 @@ const SUGGESTED_EMOJIS = [
 export default function AdminCategoriesPage() {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
-  const { user } = useAuthStore();
-  const isArtisanAdmin = user?.role === "ARTISAN_ADMIN";
+  const { user, isAuthenticated, openAuthModal } = useAuthStore();
+  const isArtisanAdmin = isAuthenticated && user?.role === "ARTISAN_ADMIN";
   const { categories, isLoading, error, fetchCategories, addCategory, updateCategory, deleteCategory } =
     useCategoryStore();
 
@@ -60,10 +61,10 @@ export default function AdminCategoriesPage() {
 
   // Auth gate check
   useEffect(() => {
-    if (user && !isArtisanAdmin) {
+    if (isMounted && (!isAuthenticated || !isArtisanAdmin)) {
       router.push("/login?error=unauthorized");
     }
-  }, [user, isArtisanAdmin, router]);
+  }, [isMounted, isAuthenticated, isArtisanAdmin, router]);
 
   const handleOpenAddModal = () => {
     setEditingCategory(null);
@@ -182,6 +183,46 @@ export default function AdminCategoriesPage() {
         <main className="flex-1 py-8 sm:py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-8 animate-pulse">
           <div className="h-10 bg-brand-sand/50 rounded-2xl w-64 mb-6" />
           <div className="h-64 bg-brand-sand/30 rounded-3xl w-full" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Security Gate: Artisan Admin role strictly required
+  if (!isAuthenticated || !isArtisanAdmin) {
+    return (
+      <div className="min-h-screen bg-brand-ivory text-brand-charcoal flex flex-col selection:bg-brand-gold/30">
+        <Navbar />
+        <main className="flex-1 py-16 max-w-2xl mx-auto px-4 sm:px-6 w-full text-center flex flex-col items-center justify-center space-y-6">
+          <div className="w-16 h-16 rounded-full bg-amber-100 border-2 border-amber-300 text-amber-800 flex items-center justify-center shadow-md">
+            <Lock className="w-8 h-8 text-amber-700" />
+          </div>
+          <div className="space-y-2">
+            <span className="text-xs font-bold uppercase tracking-widest text-brand-gold">
+              Security &amp; RBAC Access Gate
+            </span>
+            <h1 className="text-3xl font-serif font-bold text-brand-emerald">
+              Artisan Administrator Login Required
+            </h1>
+            <p className="text-xs sm:text-sm text-brand-charcoal/70 max-w-md mx-auto">
+              Category taxonomy management is restricted to authorized studio administrators. Please sign in with an artisan administrator account.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+            <button
+              onClick={() => openAuthModal("LOGIN")}
+              className="px-7 py-3 rounded-full bg-brand-emerald hover:bg-brand-teal text-white font-bold text-xs uppercase tracking-wider shadow-md transition-all cursor-pointer"
+            >
+              Sign In as Artisan Lead
+            </button>
+            <Link
+              href="/"
+              className="px-7 py-3 rounded-full bg-brand-sand hover:bg-white border border-brand-sand text-brand-charcoal font-semibold text-xs transition-all"
+            >
+              Return to Storefront
+            </Link>
+          </div>
         </main>
         <Footer />
       </div>

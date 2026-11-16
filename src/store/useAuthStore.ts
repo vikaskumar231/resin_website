@@ -134,13 +134,26 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      logout: () => {
+      logout: async () => {
         clearRoleCookie();
-        fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+        if (typeof document !== "undefined") {
+          document.cookie = "art_aalay_role=; path=/; max-age=0; SameSite=Lax";
+          document.cookie = "art_aalay_session=; path=/; max-age=0; SameSite=Lax";
+        }
+        try {
+          await fetch("/api/auth/logout", { method: "POST" });
+        } catch (e) {
+          console.warn("Logout server call failed:", e);
+        }
         set({
           user: null,
           isAuthenticated: false,
         });
+        if (typeof window !== "undefined") {
+          if (window.location.pathname.startsWith("/account") || window.location.pathname.startsWith("/admin")) {
+            window.location.href = "/";
+          }
+        }
       },
     }),
     {
