@@ -61,5 +61,32 @@
     "description": "Devotional Gayatri & sacred Sanskrit mantra frames",
     "isDefault": false,
     "displayOrder": 9
+  },
+  {
+    "id": "UAT_CAT_1794565650994",
+    "slug": "resin-coasters-1794565650994",
+    "label": "Artisanal Resin Coasters",
+    "icon": "☕",
+    "description": "Heat-resistant bespoke geode drink coasters",
+    "isDefault": false,
+    "displayOrder": 10
+  },
+  {
+    "id": "UAT_CAT_1794565743929",
+    "slug": "resin-coasters-1794565743929",
+    "label": "Artisanal Resin Coasters",
+    "icon": "☕",
+    "description": "Heat-resistant bespoke geode drink coasters",
+    "isDefault": false,
+    "displayOrder": 11
+  },
+  {
+    "id": "UAT_CAT_1794800249312",
+    "slug": "resin-coasters-1794800249312",
+    "label": "Artisanal Resin Coasters",
+    "icon": "☕",
+    "description": "Heat-resistant bespoke geode drink coasters",
+    "isDefault": false,
+    "displayOrder": 12
   }
 ]

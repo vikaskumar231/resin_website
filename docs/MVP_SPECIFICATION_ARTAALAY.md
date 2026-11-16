@@ -3,7 +3,7 @@
 **Official Brand Name:** **Artआलय** (English *Art* + Devanagari *आलय*)  
 **English Phonetic / URL Slug:** `artaalay` / `art-aalay`  
 **Platform:** Next.js (React 18/19), TypeScript, Tailwind CSS, Konva.js (react-konva), Supabase (PostgreSQL), Prisma  
-**Market:** Indian Domestic D2C (INR ₹, Razorpay UPI, Shiprocket, WhatsApp Business)  
+**Market:** Indian Domestic D2C (INR ₹, 100% Offline Settlement / COD / Direct WhatsApp, Shiprocket, WhatsApp Direct Helpline +91 9373567492)  
 **Status:** Approved for MVP Scaffolding  
 
 ---

@@ -1,8 +1,538 @@
 [
   {
+    "id": "ord_1794800249366",
+    "orderNumber": "ART-2026-09A015",
+    "userId": "user_cust_1794800249373_v7zh",
+    "customerName": "Radha Krishnan",
+    "customerEmail": "guest_1794800249312@krishnan.in",
+    "customerPhone": "+919911223344",
+    "createdAt": "2026-11-16T03:37:29.366Z",
+    "status": "ORDER_CONFIRMED",
+    "statusLabel": "Stage 1: Laser Cutting & Timber Prep",
+    "stageIndex": 1,
+    "grandTotal": 897,
+    "subtotal": 798,
+    "discount": 0,
+    "shippingFee": 99,
+    "giftWrapFee": 0,
+    "isTokenDeposit": false,
+    "tokenAmountPaid": 0,
+    "remainingTentativeBalance": 897,
+    "refundPolicyNotes": "Payment will be settled offline directly with the artisan (Cash on Delivery or Direct UPI upon design approval / delivery).",
+    "invoiceId": "INV-2026-96086",
+    "neededByDate": "2026-12-05",
+    "neededByReason": "Anniversary Keepsake",
+    "shippingAddress": {
+      "fullName": "Radha Krishnan",
+      "phone": "+919911223344",
+      "street": "Tower 3, Flat 901, Blue Ridge",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "pincode": "411057"
+    },
+    "curingTelemetry": {
+      "temperature": "26°C",
+      "humidity": "42%",
+      "timeRemaining": "Chemical cure in progress"
+    },
+    "paymentDetails": {
+      "method": "OFFLINE_SETTLEMENT",
+      "status": "PENDING_OFFLINE"
+    },
+    "items": [
+      {
+        "productId": "prod_keyring_02",
+        "productSlug": "crystal-initial-keyring",
+        "title": "Crystal Monogram Resin Letter Keyring",
+        "quantity": 2,
+        "customizationDetails": {
+          "colorway": "OCEAN_WAVE",
+          "initials": "R&K"
+        },
+        "unitPrice": 399,
+        "userId": "user_cust_1794800249373_v7zh"
+      }
+    ]
+  },
+  {
+    "id": "ord_1794800249358",
+    "orderNumber": "ART-2026-E454CA",
+    "userId": "user_cust_1794800249323_6xvy",
+    "customerName": "Aarav Deshmukh",
+    "customerEmail": "aarav_uat_1794800249312@deshmukh.in",
+    "customerPhone": "+919823011223",
+    "createdAt": "2026-11-16T03:37:29.358Z",
+    "status": "ORDER_CONFIRMED",
+    "statusLabel": "Stage 1: Laser Cutting & Timber Prep",
+    "stageIndex": 1,
+    "grandTotal": 3798,
+    "subtotal": 3798,
+    "discount": 0,
+    "shippingFee": 0,
+    "giftWrapFee": 0,
+    "isTokenDeposit": false,
+    "tokenAmountPaid": 0,
+    "remainingTentativeBalance": 3798,
+    "refundPolicyNotes": "Payment will be settled offline directly with the artisan (Cash on Delivery or Direct UPI upon design approval / delivery).",
+    "invoiceId": "INV-2026-58602",
+    "neededByDate": "2026-11-28",
+    "neededByReason": "Diwali Griha Pravesh Housewarming",
+    "shippingAddress": {
+      "fullName": "Aarav Deshmukh",
+      "phone": "+919823011223",
+      "street": "Flat 402, Shivneri Residency, Baner Road",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "pincode": "411045"
+    },
+    "curingTelemetry": {
+      "temperature": "26°C",
+      "humidity": "42%",
+      "timeRemaining": "Chemical cure in progress"
+    },
+    "paymentDetails": {
+      "method": "OFFLINE_SETTLEMENT",
+      "status": "PENDING_OFFLINE"
+    },
+    "items": [
+      {
+        "productId": "prod_nameplate_01",
+        "title": "Bespoke Artisan Ocean Wave Resin Nameplate",
+        "quantity": 1,
+        "customizationDetails": {
+          "size": "16x10",
+          "colorway": "OCEAN_WAVE",
+          "hasLedBacklight": true,
+          "typography": {
+            "line1": "The Deshmukhs",
+            "subtext": "Shanti Nivas"
+          },
+          "referencePhotoNotes": "Deep turquoise ocean swirl with gold glitter accents"
+        },
+        "unitPrice": 3798,
+        "userId": "user_cust_1794800249323_6xvy"
+      }
+    ]
+  },
+  {
+    "id": "ord_1794565743983",
+    "orderNumber": "ART-2026-46CBA1",
+    "userId": "user_cust_1794565743990_rpoq",
+    "customerName": "Radha Krishnan",
+    "customerEmail": "guest_1794565743929@krishnan.in",
+    "customerPhone": "+919911223344",
+    "createdAt": "2026-11-13T10:29:03.983Z",
+    "status": "ORDER_CONFIRMED",
+    "statusLabel": "Stage 1: Laser Cutting & Timber Prep",
+    "stageIndex": 1,
+    "grandTotal": 897,
+    "subtotal": 798,
+    "discount": 0,
+    "shippingFee": 99,
+    "giftWrapFee": 0,
+    "isTokenDeposit": false,
+    "tokenAmountPaid": 0,
+    "remainingTentativeBalance": 897,
+    "refundPolicyNotes": "Payment will be settled offline directly with the artisan (Cash on Delivery or Direct UPI upon design approval / delivery).",
+    "invoiceId": "INV-2026-68055",
+    "neededByDate": "2026-12-05",
+    "neededByReason": "Anniversary Keepsake",
+    "shippingAddress": {
+      "fullName": "Radha Krishnan",
+      "phone": "+919911223344",
+      "street": "Tower 3, Flat 901, Blue Ridge",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "pincode": "411057"
+    },
+    "curingTelemetry": {
+      "temperature": "26°C",
+      "humidity": "42%",
+      "timeRemaining": "Chemical cure in progress"
+    },
+    "paymentDetails": {
+      "method": "OFFLINE_SETTLEMENT",
+      "status": "PENDING_OFFLINE"
+    },
+    "items": [
+      {
+        "productId": "prod_keyring_02",
+        "productSlug": "crystal-initial-keyring",
+        "title": "Crystal Monogram Resin Letter Keyring",
+        "quantity": 2,
+        "customizationDetails": {
+          "colorway": "OCEAN_WAVE",
+          "initials": "R&K"
+        },
+        "unitPrice": 399,
+        "userId": "user_cust_1794565743990_rpoq"
+      }
+    ]
+  },
+  {
+    "id": "ord_1794565743974",
+    "orderNumber": "ART-2026-6F391D",
+    "userId": "user_cust_1794565743939_hzlr",
+    "customerName": "Aarav Deshmukh",
+    "customerEmail": "aarav_uat_1794565743929@deshmukh.in",
+    "customerPhone": "+919823011223",
+    "createdAt": "2026-11-13T10:29:03.974Z",
+    "status": "ORDER_CONFIRMED",
+    "statusLabel": "Stage 1: Laser Cutting & Timber Prep",
+    "stageIndex": 1,
+    "grandTotal": 3798,
+    "subtotal": 3798,
+    "discount": 0,
+    "shippingFee": 0,
+    "giftWrapFee": 0,
+    "isTokenDeposit": false,
+    "tokenAmountPaid": 0,
+    "remainingTentativeBalance": 3798,
+    "refundPolicyNotes": "Payment will be settled offline directly with the artisan (Cash on Delivery or Direct UPI upon design approval / delivery).",
+    "invoiceId": "INV-2026-67923",
+    "neededByDate": "2026-11-28",
+    "neededByReason": "Diwali Griha Pravesh Housewarming",
+    "shippingAddress": {
+      "fullName": "Aarav Deshmukh",
+      "phone": "+919823011223",
+      "street": "Flat 402, Shivneri Residency, Baner Road",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "pincode": "411045"
+    },
+    "curingTelemetry": {
+      "temperature": "26°C",
+      "humidity": "42%",
+      "timeRemaining": "Chemical cure in progress"
+    },
+    "paymentDetails": {
+      "method": "OFFLINE_SETTLEMENT",
+      "status": "PENDING_OFFLINE"
+    },
+    "items": [
+      {
+        "productId": "prod_nameplate_01",
+        "title": "Bespoke Artisan Ocean Wave Resin Nameplate",
+        "quantity": 1,
+        "customizationDetails": {
+          "size": "16x10",
+          "colorway": "OCEAN_WAVE",
+          "hasLedBacklight": true,
+          "typography": {
+            "line1": "The Deshmukhs",
+            "subtext": "Shanti Nivas"
+          },
+          "referencePhotoNotes": "Deep turquoise ocean swirl with gold glitter accents"
+        },
+        "unitPrice": 3798,
+        "userId": "user_cust_1794565743939_hzlr"
+      }
+    ]
+  },
+  {
+    "id": "ord_1794565651128",
+    "orderNumber": "ART-2026-C93798",
+    "userId": "user_cust_1794565651006_g6mp",
+    "customerName": "Aarav Deshmukh",
+    "customerEmail": "aarav_uat_1794565650994@deshmukh.in",
+    "customerPhone": "+919823011223",
+    "createdAt": "2026-11-13T10:27:31.128Z",
+    "status": "ORDER_CONFIRMED",
+    "statusLabel": "Stage 1: Laser Cutting & Timber Prep",
+    "stageIndex": 1,
+    "grandTotal": 3798,
+    "subtotal": 3798,
+    "discount": 0,
+    "shippingFee": 0,
+    "giftWrapFee": 0,
+    "isTokenDeposit": false,
+    "tokenAmountPaid": 0,
+    "remainingTentativeBalance": 3798,
+    "refundPolicyNotes": "Payment will be settled offline directly with the artisan (Cash on Delivery or Direct UPI upon design approval / delivery).",
+    "invoiceId": "INV-2026-96937",
+    "neededByDate": "2026-11-28",
+    "neededByReason": "Diwali Griha Pravesh Housewarming",
+    "shippingAddress": {
+      "fullName": "Aarav Deshmukh",
+      "phone": "+919823011223",
+      "street": "Flat 402, Shivneri Residency, Baner Road",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "pincode": "411045"
+    },
+    "curingTelemetry": {
+      "temperature": "26°C",
+      "humidity": "42%",
+      "timeRemaining": "Chemical cure in progress"
+    },
+    "paymentDetails": {
+      "method": "OFFLINE_SETTLEMENT",
+      "status": "PENDING_OFFLINE"
+    },
+    "items": [
+      {
+        "productId": "prod_nameplate_01",
+        "title": "Bespoke Artisan Ocean Wave Resin Nameplate",
+        "quantity": 1,
+        "customizationDetails": {
+          "size": "16x10",
+          "colorway": "OCEAN_WAVE",
+          "hasLedBacklight": true,
+          "typography": {
+            "line1": "The Deshmukhs",
+            "subtext": "Shanti Nivas"
+          },
+          "referencePhotoNotes": "Deep turquoise ocean swirl with gold glitter accents"
+        },
+        "unitPrice": 3798,
+        "userId": "user_cust_1794565651006_g6mp"
+      }
+    ]
+  },
+  {
+    "id": "ord_1794560689765",
+    "orderNumber": "ART-2026-047DF6",
+    "userId": "user_cust_1794560689709_nnf1",
+    "customerName": "Aarav Deshmukh",
+    "customerEmail": "aarav_uat_1794560689691@deshmukh.in",
+    "customerPhone": "+919823011223",
+    "createdAt": "2026-11-13T09:04:49.765Z",
+    "status": "ORDER_CONFIRMED",
+    "statusLabel": "Stage 1: Laser Cutting & Timber Prep",
+    "stageIndex": 1,
+    "grandTotal": 3798,
+    "subtotal": 3798,
+    "discount": 0,
+    "shippingFee": 0,
+    "giftWrapFee": 0,
+    "isTokenDeposit": false,
+    "tokenAmountPaid": 0,
+    "remainingTentativeBalance": 3798,
+    "refundPolicyNotes": "Payment will be settled offline directly with the artisan (Cash on Delivery or Direct UPI upon design approval / delivery).",
+    "invoiceId": "INV-2026-78816",
+    "neededByDate": "2026-11-28",
+    "neededByReason": "Diwali Griha Pravesh Housewarming",
+    "shippingAddress": {
+      "fullName": "Aarav Deshmukh",
+      "phone": "+919823011223",
+      "street": "Flat 402, Shivneri Residency, Baner Road",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "pincode": "411045"
+    },
+    "curingTelemetry": {
+      "temperature": "26°C",
+      "humidity": "42%",
+      "timeRemaining": "Chemical cure in progress"
+    },
+    "paymentDetails": {
+      "method": "OFFLINE_SETTLEMENT",
+      "status": "PENDING_OFFLINE"
+    },
+    "items": [
+      {
+        "productId": "prod_nameplate_01",
+        "title": "Bespoke Artisan Ocean Wave Resin Nameplate",
+        "quantity": 1,
+        "customizationDetails": {
+          "size": "16x10",
+          "colorway": "OCEAN_WAVE",
+          "hasLedBacklight": true,
+          "typography": {
+            "line1": "The Deshmukhs",
+            "subtext": "Shanti Nivas"
+          },
+          "referencePhotoNotes": "Deep turquoise ocean swirl with gold glitter accents"
+        },
+        "unitPrice": 3798,
+        "userId": "user_cust_1794560689709_nnf1"
+      }
+    ]
+  },
+  {
+    "id": "ord_1794545453733",
+    "orderNumber": "ART-2026-01334A",
+    "userId": "user_cust_1794545453565_yodb",
+    "customerName": "Aarav Deshmukh",
+    "customerEmail": "aarav_uat_1794545453521@deshmukh.in",
+    "customerPhone": "+919823011223",
+    "createdAt": "2026-11-13T04:50:53.733Z",
+    "status": "ORDER_CONFIRMED",
+    "statusLabel": "Stage 1: Laser Cutting & Timber Prep",
+    "stageIndex": 1,
+    "grandTotal": 3798,
+    "subtotal": 3798,
+    "discount": 0,
+    "shippingFee": 0,
+    "giftWrapFee": 0,
+    "isTokenDeposit": false,
+    "tokenAmountPaid": 0,
+    "remainingTentativeBalance": 3798,
+    "refundPolicyNotes": "Payment will be settled offline directly with the artisan (Cash on Delivery or Direct UPI upon design approval / delivery).",
+    "invoiceId": "INV-2026-15582",
+    "neededByDate": "2026-11-28",
+    "neededByReason": "Diwali Griha Pravesh Housewarming",
+    "shippingAddress": {
+      "fullName": "Aarav Deshmukh",
+      "phone": "+919823011223",
+      "street": "Flat 402, Shivneri Residency, Baner Road",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "pincode": "411045"
+    },
+    "curingTelemetry": {
+      "temperature": "26°C",
+      "humidity": "42%",
+      "timeRemaining": "Chemical cure in progress"
+    },
+    "paymentDetails": {
+      "method": "OFFLINE_SETTLEMENT",
+      "status": "PENDING_OFFLINE"
+    },
+    "items": [
+      {
+        "productId": "prod_nameplate_01",
+        "title": "Bespoke Artisan Ocean Wave Resin Nameplate",
+        "quantity": 1,
+        "customizationDetails": {
+          "size": "16x10",
+          "colorway": "OCEAN_WAVE",
+          "hasLedBacklight": true,
+          "typography": {
+            "line1": "The Deshmukhs",
+            "subtext": "Shanti Nivas"
+          },
+          "referencePhotoNotes": "Deep turquoise ocean swirl with gold glitter accents"
+        },
+        "unitPrice": 3798,
+        "userId": "user_cust_1794545453565_yodb"
+      }
+    ]
+  },
+  {
+    "id": "ord_1794545433933",
+    "orderNumber": "ART-2026-BA2483",
+    "userId": "user_cust_1794545433743_uiy2",
+    "customerName": "Aarav Deshmukh",
+    "customerEmail": "aarav_uat_1794545433696@deshmukh.in",
+    "customerPhone": "+919823011223",
+    "createdAt": "2026-11-13T04:50:33.933Z",
+    "status": "ORDER_CONFIRMED",
+    "statusLabel": "Stage 1: Laser Cutting & Timber Prep",
+    "stageIndex": 1,
+    "grandTotal": 3798,
+    "subtotal": 3798,
+    "discount": 0,
+    "shippingFee": 0,
+    "giftWrapFee": 0,
+    "isTokenDeposit": false,
+    "tokenAmountPaid": 0,
+    "remainingTentativeBalance": 3798,
+    "refundPolicyNotes": "Payment will be settled offline directly with the artisan (Cash on Delivery or Direct UPI upon design approval / delivery).",
+    "invoiceId": "INV-2026-15912",
+    "neededByDate": "2026-11-28",
+    "neededByReason": "Diwali Griha Pravesh Housewarming",
+    "shippingAddress": {
+      "fullName": "Aarav Deshmukh",
+      "phone": "+919823011223",
+      "street": "Flat 402, Shivneri Residency, Baner Road",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "pincode": "411045"
+    },
+    "curingTelemetry": {
+      "temperature": "26°C",
+      "humidity": "42%",
+      "timeRemaining": "Chemical cure in progress"
+    },
+    "paymentDetails": {
+      "method": "OFFLINE_SETTLEMENT",
+      "status": "PENDING_OFFLINE"
+    },
+    "items": [
+      {
+        "productId": "prod_nameplate_01",
+        "title": "Bespoke Artisan Ocean Wave Resin Nameplate",
+        "quantity": 1,
+        "customizationDetails": {
+          "size": "16x10",
+          "colorway": "OCEAN_WAVE",
+          "hasLedBacklight": true,
+          "typography": {
+            "line1": "The Deshmukhs",
+            "subtext": "Shanti Nivas"
+          },
+          "referencePhotoNotes": "Deep turquoise ocean swirl with gold glitter accents"
+        },
+        "unitPrice": 3798,
+        "userId": "user_cust_1794545433743_uiy2"
+      }
+    ]
+  },
+  {
+    "id": "ord_1794545391455",
+    "orderNumber": "ART-2026-1FEA05",
+    "userId": "user_cust_1794545391164_cl2w",
+    "customerName": "Aarav Deshmukh",
+    "customerEmail": "aarav_uat_1794545391090@deshmukh.in",
+    "customerPhone": "+919823011223",
+    "createdAt": "2026-11-13T04:49:51.455Z",
+    "status": "ORDER_CONFIRMED",
+    "statusLabel": "Stage 1: Laser Cutting & Timber Prep",
+    "stageIndex": 1,
+    "grandTotal": 3798,
+    "subtotal": 3798,
+    "discount": 0,
+    "shippingFee": 0,
+    "giftWrapFee": 0,
+    "isTokenDeposit": false,
+    "tokenAmountPaid": 0,
+    "remainingTentativeBalance": 3798,
+    "refundPolicyNotes": "Payment will be settled offline directly with the artisan (Cash on Delivery or Direct UPI upon design approval / delivery).",
+    "invoiceId": "INV-2026-80485",
+    "neededByDate": "2026-11-28",
+    "neededByReason": "Diwali Griha Pravesh Housewarming",
+    "shippingAddress": {
+      "fullName": "Aarav Deshmukh",
+      "phone": "+919823011223",
+      "street": "Flat 402, Shivneri Residency, Baner Road",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "pincode": "411045"
+    },
+    "curingTelemetry": {
+      "temperature": "26°C",
+      "humidity": "42%",
+      "timeRemaining": "Chemical cure in progress"
+    },
+    "paymentDetails": {
+      "method": "OFFLINE_SETTLEMENT",
+      "status": "PENDING_OFFLINE"
+    },
+    "items": [
+      {
+        "productId": "prod_nameplate_01",
+        "title": "Bespoke Artisan Ocean Wave Resin Nameplate",
+        "quantity": 1,
+        "customizationDetails": {
+          "size": "16x10",
+          "colorway": "OCEAN_WAVE",
+          "hasLedBacklight": true,
+          "typography": {
+            "line1": "The Deshmukhs",
+            "subtext": "Shanti Nivas"
+          },
+          "referencePhotoNotes": "Deep turquoise ocean swirl with gold glitter accents"
+        },
+        "unitPrice": 3798,
+        "userId": "user_cust_1794545391164_cl2w"
+      }
+    ]
+  },
+  {
     "id": "ord_1794410819480",
     "orderNumber": "ART-2026-7C20B7",
-    "userId": null,
+    "userId": "user_cust_1794394031156_nsve",
     "customerName": "Priya Sharma",
     "customerEmail": "priya.sharma@example.com",
     "customerPhone": "9876543210",
@@ -56,14 +586,14 @@
           "referenceImage": null
         },
         "id": "cart_1794410767586_10xzo",
-        "userId": null
+        "userId": "user_cust_1794394031156_nsve"
       }
     ]
   },
   {
     "id": "ord_1794407772263",
     "orderNumber": "ART-2026-698A22",
-    "userId": null,
+    "userId": "user_cust_1794394031156_nsve",
     "customerName": "Priya Sharma",
     "customerEmail": "priya.sharma@example.com",
     "customerPhone": "9876543210",
@@ -113,9 +643,13 @@
           "referenceImage": null
         },
         "id": "cart_1794407733888_7voog",
-        "userId": null
+        "userId": "user_cust_1794394031156_nsve"
       }
-    ]
+    ],
+    "isTokenDeposit": false,
+    "tokenAmountPaid": 0,
+    "remainingTentativeBalance": 598,
+    "refundPolicyNotes": "Payment handled offline directly with the artisan (Cash / Direct UPI on Delivery)."
   },
   {
     "id": "ord_1794400261592",
@@ -159,7 +693,7 @@
   {
     "id": "ord_1794395177097",
     "orderNumber": "ART-2026-4C8439",
-    "userId": null,
+    "userId": "user_cust_1794394031156_nsve",
     "customerName": "Priya Sharma",
     "customerEmail": "priya@example.com",
     "customerPhone": "9811122334",
@@ -200,14 +734,20 @@
           "charm": "MINI_TASSEL"
         },
         "title": "Crystal Monogram Resin Letter Keyring",
-        "userId": null
+        "userId": "user_cust_1794394031156_nsve"
       }
-    ]
+    ],
+    "isTokenDeposit": false,
+    "tokenAmountPaid": 0,
+    "remainingTentativeBalance": 547,
+    "refundPolicyNotes": "Payment handled offline directly with the artisan (Cash / Direct UPI on Delivery).",
+    "neededByDate": null,
+    "neededByReason": null
   },
   {
     "id": "ord_1794395160515",
     "orderNumber": "ART-2026-FF8B2C",
-    "userId": null,
+    "userId": "user_cust_1794394031156_nsve",
     "customerName": "Attacker",
     "customerEmail": null,
     "customerPhone": "+919876543210",
@@ -241,14 +781,20 @@
         "unitPrice": 699,
         "quantity": 1,
         "isCustomizable": false,
-        "userId": null
+        "userId": "user_cust_1794394031156_nsve"
       }
-    ]
+    ],
+    "isTokenDeposit": false,
+    "tokenAmountPaid": 0,
+    "remainingTentativeBalance": 798,
+    "refundPolicyNotes": "Payment handled offline directly with the artisan (Cash / Direct UPI on Delivery).",
+    "neededByDate": null,
+    "neededByReason": null
   },
   {
     "id": "ord_1794395153891",
     "orderNumber": "ART-2026-DB0A7A",
-    "userId": null,
+    "userId": "user_cust_1794394031156_nsve",
     "customerName": "Security Tester",
     "customerEmail": "tester@example.com",
     "customerPhone": "9876543210",
@@ -289,14 +835,20 @@
           "colorway": "OCEAN_WAVE",
           "hasLedBacklight": true
         },
-        "userId": null
+        "userId": "user_cust_1794394031156_nsve"
       }
-    ]
+    ],
+    "isTokenDeposit": false,
+    "tokenAmountPaid": 0,
+    "remainingTentativeBalance": 3798,
+    "refundPolicyNotes": "Payment handled offline directly with the artisan (Cash / Direct UPI on Delivery).",
+    "neededByDate": null,
+    "neededByReason": null
   },
   {
     "id": "ord_1049",
     "orderNumber": "ART-2026-1049",
-    "userId": "user_cust_priya_01",
+    "userId": "user_cust_1794394031156_nsve",
     "customerName": "Priya Sharma",
     "customerEmail": "priya@example.com",
     "customerPhone": "9811122334",
@@ -343,14 +895,20 @@
           "hasLedBacklight": true,
           "referenceImage": null
         },
-        "userId": "user_cust_priya_01"
+        "userId": "user_cust_1794394031156_nsve"
       }
-    ]
+    ],
+    "isTokenDeposit": false,
+    "tokenAmountPaid": 0,
+    "remainingTentativeBalance": 3798,
+    "refundPolicyNotes": "Payment handled offline directly with the artisan (Cash / Direct UPI on Delivery).",
+    "neededByDate": null,
+    "neededByReason": null
   },
   {
     "id": "ord_1050",
     "orderNumber": "ART-2026-1050",
-    "userId": "user_cust_priya_01",
+    "userId": "user_cust_1794394031156_nsve",
     "customerName": "Priya Sharma",
     "customerEmail": "priya@example.com",
     "customerPhone": "9811122334",
@@ -389,9 +947,20 @@
           "charm": "MINI_TASSEL",
           "hasEngravedTag": false
         },
-        "userId": "user_cust_priya_01"
+        "userId": "user_cust_1794394031156_nsve"
       }
-    ]
+    ],
+    "isTokenDeposit": false,
+    "tokenAmountPaid": 0,
+    "remainingTentativeBalance": 448,
+    "refundPolicyNotes": "Payment handled offline directly with the artisan (Cash / Direct UPI on Delivery).",
+    "neededByDate": null,
+    "neededByReason": null,
+    "curingTelemetry": {
+      "temperature": "26°C",
+      "humidity": "42%",
+      "timeRemaining": "Chemical cure in progress"
+    }
   },
   {
     "id": "ord_1051",

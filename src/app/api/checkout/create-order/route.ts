@@ -5,6 +5,8 @@ import { HERO_PRODUCTS } from "@/lib/mockData";
 import { sanitizeLaserText } from "@/lib/sanitizer";
 import { evaluateCoupon } from "@/lib/discounts/couponEngine";
 import { orderRepository } from "@/lib/repositories/orderRepository";
+import { verifySessionToken } from "@/lib/auth/session";
+import { userRepository } from "@/lib/repositories/userRepository";
 
 export async function POST(req: NextRequest) {
   try {
@@ -168,11 +170,25 @@ export async function POST(req: NextRequest) {
     const randomSuffix = crypto.randomBytes(3).toString("hex").toUpperCase();
     const orderNumber = `ART-${year}-${randomSuffix}`;
 
+    // Extract authenticated user ID from session cookie or body, or match by email/phone
+    const sessionCookie = req.cookies.get("art_aalay_session")?.value;
+    const session = sessionCookie ? await verifySessionToken(sessionCookie) : null;
+    let resolvedUserId: string | null = body.userId || (session?.valid ? session.userId : null);
+
+    if (!resolvedUserId) {
+      if (customerEmail || cleanPhone) {
+        const matchedUser = await userRepository.findByIdentifier(customerEmail || cleanPhone);
+        if (matchedUser) {
+          resolvedUserId = matchedUser.id;
+        }
+      }
+    }
+
     // 6. Persist order directly to disk/database repository with OFFLINE_SETTLEMENT status
     try {
       orderRepository.saveOrder({
         orderNumber,
-        userId: body.userId || null,
+        userId: resolvedUserId,
         customerName: shippingAddress.fullName || "Artisan Patron",
         customerEmail: customerEmail || null,
         customerPhone: cleanPhone,

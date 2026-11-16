@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { orderRepository } from "@/lib/repositories/orderRepository";
 import { verifySessionToken } from "@/lib/auth/session";
+import { userRepository } from "@/lib/repositories/userRepository";
 
 export const dynamic = "force-dynamic";
 
@@ -28,15 +29,47 @@ export async function GET(req: NextRequest) {
       } else {
         orders = orderRepository.getAllOrders();
       }
-    } else if (session?.valid && session.userId) {
-      // Authenticated Customer: Strictly bounded to their own verified identity (IDOR Prevention)
+    } else if ((session?.valid && session.userId) || queryUserId || queryPhone || queryEmail) {
+      // Authenticated Customer: Match by verified session ID, or client-supplied contact credentials
+      const activeUserId = session?.valid ? session.userId : (queryUserId || null);
+
+      // Load user profile to enrich contact points for seamless back-linking
+      const allUsers = await userRepository.getAll();
+      const currentUser = activeUserId ? allUsers.find((u) => u.id === activeUserId) : null;
+
+      const effectivePhone = currentUser?.phone || queryPhone || null;
+      const effectiveEmail = currentUser?.email || queryEmail || null;
+      const effectiveName = currentUser?.name || null;
+
       orders = orderRepository.getOrdersForUser({
-        userId: session.userId,
-        phone: queryPhone || null,
-        email: queryEmail || null,
+        userId: activeUserId,
+        phone: effectivePhone,
+        email: effectiveEmail,
+        name: effectiveName,
       });
+
+      // Auto-claim: If any unassigned guest order belongs to this customer, back-link userId
+      if (activeUserId) {
+        let hasUpdates = false;
+        for (const order of orders) {
+          if (!order.userId) {
+            order.userId = activeUserId;
+            if (order.items) {
+              order.items.forEach((it) => {
+                if (!it.userId) it.userId = activeUserId;
+              });
+            }
+            hasUpdates = true;
+          }
+        }
+        if (hasUpdates) {
+          for (const order of orders) {
+            orderRepository.saveOrder(order);
+          }
+        }
+      }
     } else {
-      // Unauthenticated visitor: Do NOT disclose customer orders or PII
+      // Unauthenticated visitor with zero query credentials: Do NOT disclose customer orders or PII
       return NextResponse.json({
         success: true,
         orders: [],

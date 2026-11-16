@@ -59,10 +59,120 @@
     "username": "Priya",
     "name": "Priya Sharma",
     "email": "priya@priya.com",
-    "phone": "",
+    "phone": "+91 98765 43210",
     "role": "CUSTOMER",
     "passwordHash": "7c0f402a6262422d77783366976bf7f78ccc97846c6aacaca8181c53d05b1d1e9a6b06ca4499d33defd63fa509d8a1531d5aca590ab2ceafb476986b49eff43f",
     "salt": "5c4d149d335f6fd1b5e384a85155d597",
     "createdAt": "2026-11-11T10:47:11.156Z"
+  },
+  {
+    "id": "user_cust_1794545391164_cl2w",
+    "username": "patron_uat_1794545391090",
+    "name": "Aarav Deshmukh",
+    "email": "aarav_uat_1794545391090@deshmukh.in",
+    "phone": "+91 98230 11223",
+    "role": "CUSTOMER",
+    "passwordHash": "e73a7120fce0143469b8ccf419b781253a05c3ff6244f7596f6099492b7882de5b09f83a6623448308bd19e5c11ce79d48d891f7a8f7d2cdc4ace7754e548c8e",
+    "salt": "0e9bf211a0fbe45c553368cc212e82d6",
+    "createdAt": "2026-11-13T04:49:51.165Z"
+  },
+  {
+    "id": "user_cust_1794545433743_uiy2",
+    "username": "patron_uat_1794545433696",
+    "name": "Aarav Deshmukh",
+    "email": "aarav_uat_1794545433696@deshmukh.in",
+    "phone": "+91 98230 11223",
+    "role": "CUSTOMER",
+    "passwordHash": "9911c36928b162692a37af45a74978ddbd3f21f0ec901a6e4f2ac224001662b771bb9cc09f6081dfa6b4368c22fb42d0846c79f7bcae2191df72c5327117609d",
+    "salt": "3c96ea7669bd69c99f2a8465c8b7d8ca",
+    "createdAt": "2026-11-13T04:50:33.743Z"
+  },
+  {
+    "id": "user_cust_1794545453565_yodb",
+    "username": "patron_uat_1794545453521",
+    "name": "Aarav Deshmukh",
+    "email": "aarav_uat_1794545453521@deshmukh.in",
+    "phone": "+91 98230 11223",
+    "role": "CUSTOMER",
+    "passwordHash": "8b549befa1d66aa2bee296463e3bd7544a8046b3f1cd1dd72bae102aadda9ade8b99598c30441ff4ec475fac4ee69d57d7137f5fcbaee3e6bdf555e21a24ff8c",
+    "salt": "6970f3427fe721b3d9975831935780b0",
+    "createdAt": "2026-11-13T04:50:53.565Z"
+  },
+  {
+    "id": "user_cust_1794560689709_nnf1",
+    "username": "patron_uat_1794560689691",
+    "name": "Aarav Deshmukh",
+    "email": "aarav_uat_1794560689691@deshmukh.in",
+    "phone": "+91 98230 11223",
+    "role": "CUSTOMER",
+    "passwordHash": "1d5fd51ba34e092d77a8e0d26570944f683ac902ba98d90c2ce96107bb52d04358ddd6a17c74de5bc73e47fb050d263803b1f48e1a4f2aa846613b63672c69a1",
+    "salt": "bf161cd26a604a783210aa210f2aaa1c",
+    "createdAt": "2026-11-13T09:04:49.709Z"
+  },
+  {
+    "id": "user_cust_1794565651006_g6mp",
+    "username": "patron_uat_1794565650994",
+    "name": "Aarav Deshmukh",
+    "email": "aarav_uat_1794565650994@deshmukh.in",
+    "phone": "+91 98230 11223",
+    "role": "CUSTOMER",
+    "passwordHash": "71e82e877a330c90e194cff36d03d426fc5b6e9bf1c0687fdbc6ef119a93eda643f87c0055140034be40564b3f73155efa07a5f4a3bf894a683e5ad691bc59b0",
+    "salt": "c701bfbb39b024175e703e795e0a57ba",
+    "createdAt": "2026-11-13T10:27:31.006Z"
+  },
+  {
+    "id": "user_cust_1794565651167_rutq",
+    "username": "radha_converted_1794565650994",
+    "name": "Radha Krishnan",
+    "email": "guest_1794565650994@krishnan.in",
+    "phone": "+91 99112 23344",
+    "role": "CUSTOMER",
+    "passwordHash": "929eb99bd18263d80fde1a0c68dc29a2b970f039e0b56b972e1cc70d523c6a641ed188c5fca159cdb878db2e67626077be07c7751c5825e5fd9564dfba5214b9",
+    "salt": "a4b8ce502f881e4c10f5d5f518a71e15",
+    "createdAt": "2026-11-13T10:27:31.167Z"
+  },
+  {
+    "id": "user_cust_1794565743939_hzlr",
+    "username": "patron_uat_1794565743929",
+    "name": "Aarav Deshmukh",
+    "email": "aarav_uat_1794565743929@deshmukh.in",
+    "phone": "+91 98230 11223",
+    "role": "CUSTOMER",
+    "passwordHash": "8df37b970738257219676017c1dda10e15db760615a4a7132fb17bcca622245cb76dcde4cc16d5aa5382b908db2596ceb358edc7c73e9330ec84a3feee9e93bc",
+    "salt": "4903067d8c4a30d236501eed1c4e2e39",
+    "createdAt": "2026-11-13T10:29:03.939Z"
+  },
+  {
+    "id": "user_cust_1794565743990_rpoq",
+    "username": "radha_converted_1794565743929",
+    "name": "Radha Krishnan",
+    "email": "guest_1794565743929@krishnan.in",
+    "phone": "+91 99112 23344",
+    "role": "CUSTOMER",
+    "passwordHash": "e6f5e41cce5fdc1d1439a4e5e991dcffdd003481cf9b021c4e95f3264aa5e1615cb50da23d56840bcc899e57ea3e155f1d12641eb7dc200a3919d87b1abc89f8",
+    "salt": "89f5f95cb7233b2c6753098ce567fc47",
+    "createdAt": "2026-11-13T10:29:03.990Z"
+  },
+  {
+    "id": "user_cust_1794800249323_6xvy",
+    "username": "patron_uat_1794800249312",
+    "name": "Aarav Deshmukh",
+    "email": "aarav_uat_1794800249312@deshmukh.in",
+    "phone": "+91 98230 11223",
+    "role": "CUSTOMER",
+    "passwordHash": "b0df5bb9cd4b73aa7360d663c29deb225ca7631082a82703d89ef804ecdc4520e19a04181010f71ee399fa3532c678d218a37047e10f06d0288dbc66e20414ac",
+    "salt": "daff9610caaffaa7db3bd76be7d37e74",
+    "createdAt": "2026-11-16T03:37:29.323Z"
+  },
+  {
+    "id": "user_cust_1794800249373_v7zh",
+    "username": "radha_converted_1794800249312",
+    "name": "Radha Krishnan",
+    "email": "guest_1794800249312@krishnan.in",
+    "phone": "+91 99112 23344",
+    "role": "CUSTOMER",
+    "passwordHash": "1a781014ee2d79545ee61f11c682dc0bc0a5b535bc83a2016ef75ea203c1f0e1e2c7d797db7293e7a3f79957e7a6f537be2c26631049a9d3685887aed743af20",
+    "salt": "d065c508081728bf859aedaa9f9f5687",
+    "createdAt": "2026-11-16T03:37:29.373Z"
   }
 ]

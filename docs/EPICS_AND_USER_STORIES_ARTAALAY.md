@@ -7,7 +7,7 @@
 - **Mary (BMad Business Analyst 📊)** — Indian Tax Compliance, Customer Journeys & MECE Traceability  
 - **Winston (BMad System Architect 🏗️)** — Technical Feasibility, Data Integrity, Edge Cases & Security  
 **Product:** **Artआलय** (Handcrafted Resin E-Commerce Platform)  
-**Target Market:** India Domestic D2C (INR ₹, UPI via Razorpay, Shiprocket Logistics, WhatsApp Cloud API)  
+**Target Market:** India Domestic D2C (INR ₹, 100% Offline Settlement / COD / WhatsApp, Shiprocket Logistics, WhatsApp Direct Helpline +91 9373567492)  
 **Scope Status:** Fully Audited, Multi-Agent Approved for Production Scaffolding  
 
 ---
@@ -60,7 +60,7 @@
          ▼                  ▼                       ▼                       ▼                  ▼
     [EPIC 0: Auth]    [EPIC 1: Customizer]    [EPIC 2: Catalog]       [EPIC 3: Checkout] [EPIC 4: Proof]
     • Phone OTP/Email • Konva 2D Engine       • Mobile-First PDPs     • Guest Checkout   • WhatsApp Loop
-    • RBAC Guard      • Layer Stacking        • Disclaimers & Care    • Razorpay UPI     • Skip / Upload
+    • RBAC Guard      • Layer Stacking        • Disclaimers & Care    • Offline Pay      • Skip / Upload
     • Address Book    • 300 DPI Export        • Reviews & Search      • Order Receipt    • 1-Click Signoff
          │                  │                       │                       │                  │
          └──────────────────┼───────────────────────┴───────────────────────┼──────────────────┘

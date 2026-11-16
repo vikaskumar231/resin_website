@@ -105,13 +105,13 @@ The schema comprises **21 relational tables** divided into 7 functional domains:
 | `coupons` | Promotional vouchers and discount codes. | `code` uppercase unique, discount type (`PERCENTAGE` / `FLAT_AMOUNT`), minimum cart threshold, usage limits. |
 | `coupon_usages` | Ledger tracking coupon redemptions per customer/order. | Prevents duplicate reuse of single-use welcome coupons. |
 | `order_status_history` | Immutable timeline tracking every order state transition. | Previous status, new status, transition actor (System, Customer, Artisan), timestamp, optional note. |
-| `refunds` | Financial refund records for pre-pour cancellations or defect compensations. | Razorpay refund ID, amount, reason, processed timestamp. |
+| `refunds` | Financial refund records for pre-pour cancellations or defect compensations. | Offline settlement reference, reason, processed timestamp. |
 
-### 3.5 Domain 5: Payments & Anti-RTO Governance (`EPIC 3`)
+### 3.5 Domain 5: Offline Settlement & Payment Governance (`EPIC 3`)
 
 | Table Name | Description | Key Invariants |
 | :--- | :--- | :--- |
-| `payments` | Financial payment transactions. | Payment gateway reference (`razorpay_order_id`, `razorpay_payment_id`), signature verification status, gateway fee, net amount. |
+| `payments` | Financial payment transactions. | Payment method (`OFFLINE_SETTLEMENT`), status (`PENDING_OFFLINE`, `SETTLED_OFFLINE`), offline notes (Cash on delivery / Direct WhatsApp settlement). Zero third-party gateway dependencies. |
 
 ### 3.6 Domain 6: Flexible Artisan Proof Approval Loop (`EPIC 4`)
 

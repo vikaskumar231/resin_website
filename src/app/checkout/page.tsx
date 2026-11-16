@@ -6,6 +6,7 @@ import Link from "next/link";
 import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
 import { useCartStore } from "@/store/useCartStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import {
   ShieldCheck,
   CreditCard,
@@ -23,6 +24,7 @@ import {
 export default function CheckoutPage() {
   const router = useRouter();
   const cart = useCartStore();
+  const { user } = useAuthStore();
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,12 +35,23 @@ export default function CheckoutPage() {
   const [neededByDate, setNeededByDate] = useState("");
   const [neededByReason, setNeededByReason] = useState("");
 
-  // Form State
+  // Form State - Prepopulated from authenticated user session
   const [contact, setContact] = useState({
-    fullName: "Priya Sharma",
-    phone: "9876543210",
-    email: "priya.sharma@example.com",
+    fullName: user?.name || "Priya Sharma",
+    phone: (user?.phone ? user.phone.replace(/\D/g, "").slice(-10) : "") || "9876543210",
+    email: user?.email || "priya.sharma@example.com",
   });
+
+  // Sync contact details if authenticated user loads asynchronously
+  React.useEffect(() => {
+    if (user) {
+      setContact((prev) => ({
+        fullName: user.name || prev.fullName,
+        phone: (user.phone ? user.phone.replace(/\D/g, "").slice(-10) : "") || prev.phone,
+        email: user.email || prev.email,
+      }));
+    }
+  }, [user]);
 
   const [shipping, setShipping] = useState({
     street: "Flat 402, Nilgiri Heights, Baner Road",
@@ -89,6 +102,7 @@ export default function CheckoutPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          userId: user?.id || undefined,
           items: cart.items,
           customerPhone: contact.phone,
           customerEmail: contact.email,
